@@ -70,6 +70,41 @@ def is_normalized_priority(priority):
 
     return True
 
+def show_tasks(tasks):
+    if not tasks:
+        print()
+        print("Спсиок задач еще пуст")
+        print()
+
+    for task in tasks:
+        print(f"ID: {task['id']}; Задача: {task['title']}; Приоритет: {task['priority']}; Статус: {task['is_done']}")
+
+def find_task(tasks):
+    if tasks:
+        while True:
+            task_id = input('Введите ID задачи: ')
+            if task_id:
+                task_id = int(task_id)
+                if task_id not in get_tasks_ids(tasks):
+                    print("Переданной задачи нет в списке")
+                for task in tasks:
+                    if task_id == task['id']:
+                        print(f"ID: {task['id']}; Задача: {task['title']}; Приоритет: {task['priority']}; Статус: {task['is_done']}")
+            else:
+                print("ID задачи не введен")
+                continue
+            break
+    else:
+        print("Список задач - пуст")
+
+def get_tasks_ids(tasks):
+    ids = []
+
+    for task in tasks:
+        ids.append(task['id'])
+
+    return ids
+
 while True:
     show_menu()
     command = input("Выбирете пункт меню: ")
@@ -79,10 +114,10 @@ while True:
             add_task(tasks)
 
         if command == '2':
-            ...
+            show_tasks(tasks)
 
         if command == '3':
-            ...
+            find_task(tasks)
 
         if command == '4':
             ...
