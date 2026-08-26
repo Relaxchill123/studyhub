@@ -105,6 +105,48 @@ def get_tasks_ids(tasks):
 
     return ids
 
+def mark_done_tasks(tasks):
+
+    if tasks:
+        while True:
+            task_id = input('Введите ID задачи для изменения статуса: ')
+            if task_id:
+                task_id = int(task_id)
+                if task_id not in get_tasks_ids(tasks):
+                    print("Переданной задачи нет в списке, просмотреть список задач? Y/N")
+                    res = input()
+                    if res == "Y":
+                        show_tasks(tasks)
+                        mark_done_tasks(tasks) 
+            else:
+                print("ID задачи не введен")
+                continue
+            break
+    else:
+        print("Список задач - пуст")
+
+    for task in tasks:
+        if task_id == task['id']:
+            if not task['is_done']:
+                task['is_done'] = True
+                print('Отмечена как выполненная')
+            else:
+                print("Задача уже выполнена")
+
+def get_stats(tasks):
+    done = 0
+    not_done = 0
+
+    if tasks:
+        for task in tasks:
+            if task['is_done']:
+                done += 1
+            else:
+                not_done +=1
+        print(f"Задач выполнено: {done}; Задач не выполнено: {not_done}")
+    else:
+        print("Cписок задач - пуст")
+
 while True:
     show_menu()
     command = input("Выбирете пункт меню: ")
@@ -120,10 +162,10 @@ while True:
             find_task(tasks)
 
         if command == '4':
-            ...
+            mark_done_tasks(tasks)
 
         if command == '5':
-            ...
+            get_stats(tasks)
 
         if command == '6':
             print("Программа завершена")
