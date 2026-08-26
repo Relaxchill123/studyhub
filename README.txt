@@ -3,6 +3,17 @@
 ## Запуск с командами python main.py и py main.py.
 ## Проверка: добавить две задачи, завершить одну, вывести статистику.
 
+
+# На компьтере должен быть установлен Python и Git
+# Для проверки используйте команды python -- version и git --version
+# Запуск
+git clone https://github.com/Relaxchill123/studyhub.git
+mkdir studyhub-planner
+cd studyhub-planner
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python main.py
+
 ## Контрольный сценарий.
 Шаг 1. Запустите проект командой из README.
 
