@@ -8,8 +8,7 @@
 # Для проверки используйте команды python -- version и git --version
 # Запуск
 git clone https://github.com/Relaxchill123/studyhub.git
-mkdir studyhub-planner
-cd studyhub-planner
+cd studyhub
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python main.py

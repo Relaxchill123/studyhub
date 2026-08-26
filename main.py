@@ -19,8 +19,13 @@ def valid_command(command):
 
 def add_task(tasks):
     id = get_next_id(tasks)
-    title = normalize_title(input("Введите задачу: "))
     while True:
+        title = input("Введите задачу: ")
+
+        if not normalize_title(title):
+            continue
+        title = normalize_title(title)
+
         priority = input("Введите приоритет: ")
         if is_normalized_priority(priority):
             break
@@ -56,7 +61,7 @@ def normalize_title(title):
     cleaned = title.strip()
     if cleaned == "":
         print("Название не может быть пустым")
-        add_task(tasks)
+        return False
     return cleaned
 
 def is_normalized_priority(priority):
