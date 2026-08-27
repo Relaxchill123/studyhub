@@ -21,10 +21,11 @@ def add_task(tasks):
     id = get_next_id(tasks)
     while True:
         title = input("Введите задачу: ")
-
-        if not normalize_title(title):
-            continue
         title = normalize_title(title)
+
+        if not title:
+            print("Название не может быть пустым")
+            continue        
 
         priority = input("Введите приоритет: ")
         if is_normalized_priority(priority):
@@ -38,8 +39,7 @@ def add_task(tasks):
             'priority': priority,
             'is_done': False,
         })
-    print(f"Задача {title} добавлена в tasks")
-    print(tasks)
+    print(f"Задача добавлена в tasks")
 
 def get_next_id(tasks):
 
@@ -58,11 +58,7 @@ def get_next_id(tasks):
     return next_id + 1
 
 def normalize_title(title):
-    cleaned = title.strip()
-    if cleaned == "":
-        print("Название не может быть пустым")
-        return False
-    return cleaned
+    return title.strip()
 
 def is_normalized_priority(priority):
     if not priority:
