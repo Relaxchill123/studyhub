@@ -1,6 +1,6 @@
-from validators import normalize_title, is_normalized_priority, validate_command
-from services import add_task, find_task, get_next_id, get_stats, mark_done_tasks
-from exceptions import TaskNotFoundError
+from app.validators import normalize_title, is_normalized_priority, validate_command
+from app.services import add_task, find_task, get_stats, mark_done_tasks
+from app.exceptions import TaskNotFoundError
 
 tasks = []
 menu = ['Добавить задачу', 'Показать задачи', 'Найти задачу', 'Отметить выполненную задачу', 'Показать статистику', 'Выйти']

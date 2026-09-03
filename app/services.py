@@ -1,5 +1,16 @@
-from exceptions import TaskNotFoundError
+from app.exceptions import TaskNotFoundError
 
+def add_task(tasks, title, priority=3):
+    ''' получает list; ничего не возвращает; изменяет tasks'''
+    id = get_next_id(tasks)
+
+    tasks.append({
+            'id': id,
+            'title': title,
+            'priority': priority,
+            'is_done': False,
+        })
+    print(f"\nЗадача добавлена в tasks")
 
 def get_next_id(tasks):
     ''' получает list; возвращает int; побочных эффектов не имеет'''
@@ -26,6 +37,7 @@ def mark_done_tasks(tasks, task_id):
     ''' получает list; возвращает строку; изменяет tasks'''
     task = find_task(tasks, task_id)
     if not task['is_done']:
+        task['is_done'] = True
         return "Отмечена как выполненная"
     return "Задача уже выполнена"
 
