@@ -1,17 +1,16 @@
 from app.exceptions import TaskNotFoundError
+from app.models import create_task
+from app.validators import normalize_title
 
-def add_task(tasks, title, priority=3):
-    ''' получает list; ничего не возвращает; изменяет tasks'''
-    id = get_next_id(tasks)
 
-    tasks.append({
-            'id': id,
-            'title': title,
-            'priority': priority,
-            'is_done': False,
-        })
-    print(f"\nЗадача добавлена в tasks")
-
+def add_task(tasks, title, priority):
+    ''' получает list, dict; возвращает str; изменяет tasks'''
+    task_id = get_next_id(tasks)
+    title = normalize_title(title)
+    task = create_task(tasks, task_id, title, priority)
+    
+    tasks.append(task)
+    
 def get_next_id(tasks):
     ''' получает list; возвращает int; побочных эффектов не имеет'''
     if not tasks:
