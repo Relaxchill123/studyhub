@@ -2,6 +2,16 @@ from app.exceptions import TaskNotFoundError
 from app.models import create_task
 from app.validators import normalize_title
 
+def get_titles(tasks):
+    if not tasks:
+        return []
+
+    titles = []
+    for task in tasks:
+        if task.get('title'):
+            titles.append(task['title'])
+
+    return titles
 
 def add_task(tasks, title, priority):
     ''' получает list, dict; возвращает str; изменяет tasks'''
