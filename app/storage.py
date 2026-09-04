@@ -1,17 +1,35 @@
 from pathlib import Path
+import json
 
-DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.txt"
+DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 def load_tasks():
-    # if not DATA_FILE.exists():
+    if not DATA_FILE.exists():
         return []
-    # return DATA_FILE.read_text(encoding="utf-8")
+    try:
+        with DATA_FILE.open('r', encoding='utf-8') as file:
+            value = json.load(file)
+    except json.JSONDecodeError as error:
+        raise ValueError(
+            f"tasks.json повреждён: строка {error.lineno}"
+        ) from error
 
-def save_tasks(text):
-    # DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
-    # DATA_FILE.write_text(text, encoding="utf-8")
-    ...
+
+    if not isinstance(value, list):
+        raise ValueError("Ожидался список")
+
+    return value
+
+def save_tasks(tasks):
+    DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with DATA_FILE.open('w', encoding='utf-8') as file:
+        json.dump(
+            tasks,
+            file,
+            ensure_ascii=False,
+            indent=2
+        )
 
 def load_titles(titles):
     if not titles:

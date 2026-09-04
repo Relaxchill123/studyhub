@@ -7,7 +7,7 @@ from app.models import create_task
 
 def run():
     tasks = load_tasks()
-    titles = load_titles(get_titles(tasks))
+    # titles = load_titles(get_titles(tasks))
 
     while True:
         show_menu()
@@ -36,7 +36,7 @@ def run():
         if command == '6':
             print("Программа завершена")
             save_tasks(tasks)
-            save_titles(get_titles(tasks))
+            # save_titles(get_titles(tasks))
             break   
 
         if not tasks:
