@@ -1,9 +1,8 @@
-from app.validators import normalize_title, is_normalized_priority
+from app.validators import is_normalized_priority
 from app.services import add_task, find_task, get_stats, mark_done_tasks, get_next_id, get_titles
 from app.exceptions import TaskNotFoundError
 from app.storage import load_tasks, save_tasks, load_titles, save_titles
 from app.cli import show_menu, get_command  
-from app.models import create_task
 
 def run():
     tasks = load_tasks()
@@ -61,6 +60,9 @@ def run():
             except TaskNotFoundError:
                 print("\nПереданной задачи нет в списке\n")
                 continue
+            except ValueError:
+                print("\nОжидалось число")
+                continue
 
             print(task, '\n')
 
@@ -74,6 +76,9 @@ def run():
                 res = mark_done_tasks(tasks, int(task_id))
             except TaskNotFoundError:
                 print("\nПереданной задачи нет в списке\n")
+                continue
+            except ValueError:
+                print("\nОжидалось число")
                 continue
 
             if not res:

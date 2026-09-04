@@ -12,4 +12,4 @@ def get_command():
     if validate_command(command):
         return command
 
-    return ("\nВыберите пункт меню корректно (число от 1 до 6)\n")
+    print("\nВыберите пункт меню корректно (число от 1 до 6)\n")
