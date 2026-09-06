@@ -12,4 +12,4 @@ def normalize_title(title):
 
 def is_normalized_priority(priority):
     ''' получает int; возвращет bool; побочных эффектов не имеет '''
-    return 1 <= priority <=5
+    return priority in VALID_PRIORITYS

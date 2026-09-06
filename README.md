@@ -9,9 +9,13 @@
 # Для проверки используйте команды python -- version и git --version
 # Запуск
 git clone https://github.com/Relaxchill123/studyhub.git
+
 cd studyhub
+
 python -m venv .venv
+
 .\.venv\Scripts\Activate.ps1
+
 python main.py
 
 ## Контрольный сценарий.
