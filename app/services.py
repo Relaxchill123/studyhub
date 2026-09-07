@@ -15,7 +15,7 @@ def get_titles(tasks):
 
 def add_task(tasks, title, priority, tags): 
     ''' получает list, dict; возвращает str; изменяет tasks'''
-    task = Task(get_next_id(tasks), title, int(priority), _tags = tags) 
+    task = Task(get_next_id(tasks), title, priority, _tags = tags) 
     
     tasks.append(task)
     
@@ -66,4 +66,5 @@ def task_from_dict(task):
             task['title'],
             task['priority'],
             task['is_done'],
+            task['tags']
         )

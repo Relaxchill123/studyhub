@@ -3,8 +3,8 @@ from dataclasses import dataclass, field
 @dataclass
 class Task:
     _id: int
-    _title: str
-    _priority: int
+    title: str
+    priority: int
     _is_done: bool = False
     _tags: list[str] = field(
         default_factory=list,
@@ -16,8 +16,10 @@ class Task:
         if not self.title:
             raise ValueError("Название не может быть пустым")
 
-        if not 1 <= self.priority <= 5:
-            raise ValueError("Приоритет должен быть от 1 до 5")
+        # if not 1 <= self.priority <= 5:
+        #     raise ValueError("Приоритет должен быть от 1 до 5")
+        ... # Зачем тут нужен пост инит если значения присваиваются через сеттеры, в которых есть проверки
+
 
     @property
     def id(self):
@@ -40,10 +42,12 @@ class Task:
 
     @priority.setter
     def priority(self, value):
-        # if not isinstance(value, int):
-        #     raise ValueError("Приоритет должен быть int")
+        try:
+            self._priority = int(value)
+        except ValueError as e:
+            raise ValueError("Приоритет должен быть целым числом")
 
-        if not 1 <= value <= 5:
+        if not 1 <= self._priority <= 5:
             raise ValueError("Приоритет должен быть от 1 до 5")
 
         self._priority = value
@@ -73,5 +77,5 @@ class Task:
 
     def __str__(self):
         mark = "x" if self._is_done else " "
-        tags = f"Тэги: {', '.join(self._tags)}" if self._tags else ''
-        return f"[{mark}] {self._id}. {self._title} {tags}" # добавить отображение для пользователя
+        tags = f"| Тэги: {', '.join(self._tags)}" if self._tags else ''
+        return f"[{mark}] {self._id}. {self._title} {tags}" 

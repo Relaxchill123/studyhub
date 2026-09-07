@@ -22,47 +22,19 @@
   },
   {
     "id": 4,
-    "title": "wer",
+    "title": "fghsdhgdf",
     "priority": 5,
     "is_done": false,
-    "tags": []
+    "tags": [
+      "Dsfds",
+      "Fdsfs"
+    ]
   },
   {
     "id": 5,
-    "title": "qwe",
-    "priority": 5,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 6,
-    "title": "qsdf",
-    "priority": 2,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 7,
-    "title": "dfkjhg",
-    "priority": 5,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 8,
-    "title": "fswdaf",
-    "priority": 2,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 9,
-    "title": "qwr\tq",
+    "title": "dasda",
     "priority": 3,
     "is_done": false,
-    "tags": [
-      "sdfg",
-      "sdfgsdg"
-    ]
+    "tags": ""
   }
 ]
