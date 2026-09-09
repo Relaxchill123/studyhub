@@ -1,16 +1,15 @@
 import json
-
+from app.models import Task
+from app.services import task_from_dict
 class MemoryStorage: # для тестов, будет получать на вход список экземпляров класс Task
-    def __init__(self, tasks: list = None):
-        self._tasks = [] if tasks is None else tasks
+    def __init__(self, tasks=None):
+        self._tasks = list(tasks or [])
 
-    @property
-    def tasks(self):
-        return self._tasks
+    def load(self):
+        return list(self._tasks)
 
-    @tasks.setter
-    def tasks(self, task):
-        self._tasks.append(task)
+    def save(self, tasks):
+        self._tasks = list(tasks)
 
 class JsonStorage:
 
@@ -23,23 +22,25 @@ class JsonStorage:
             return []
         try:
             with self._data_file.open('r', encoding='utf-8') as file:
-                value = json.load(file)
+                data = json.load(file)
         except json.JSONDecodeError as error:
             raise ValueError(
                 f"tasks.json повреждён: строка {error.lineno}"
             ) from error
 
 
-        if not isinstance(value, list):
+        if not isinstance(data, list):
             raise ValueError("Ожидался список")
 
-        return value
+        return [task_from_dict(item) for item in data]
     
     def save(self, tasks):
+        data = [task.task_to_dict() for task in tasks]
+
         try:
             with self._data_file.open('w', encoding='utf-8') as file:
                 json.dump(
-                    tasks,
+                    data,
                     file,
                     ensure_ascii=False,
                     indent=2

@@ -1,6 +1,6 @@
 from pathlib import Path
 from app.validators import is_normalized_priority
-from app.services import add_task, find_task, get_stats, mark_done_tasks, get_next_id, get_titles, task_from_dict
+from app.services import add_task, find_task, get_stats, mark_done_tasks, get_next_id, get_titles
 from app.exceptions import TaskNotFoundError
 # from app.storage import load_tasks, save_tasks, load_titles, save_titles
 from app.cli import show_menu, get_command  
@@ -12,8 +12,7 @@ DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 def run():
     tasks = []
     loaded_tasks = JsonStorage(DATA_FILE)
-    for task in loaded_tasks.load():
-        tasks.append(task_from_dict(task))
+    tasks = loaded_tasks.load()
     # titles = load_titles(get_titles(tasks))
 
     while True:
@@ -28,17 +27,16 @@ def run():
             #     print("\nНазвание не может быть пустым\n")
             #     continue
 
-            priority = input("\nВведите приоритет: ").strip()
+            try:
+                priority = int(input("\nВведите приоритет: ").strip())
+            except ValueError:
+                print('Ожидалось число')
+                continue
 
             if not priority:
                 priority = 3
 
-            tags = input("\nВведите теги через пробел: ")
-
-            if tags:
-                tags = tags.split()
-            else:
-                tags = ''
+            tags = input("\nВведите теги через пробел: ").split()
 
             # if not is_normalized_priority(priority):
             #     print("\n Введите корректно приоритет задачи (число от 1 до 5)\n")
@@ -51,10 +49,7 @@ def run():
             print("Задача добавлена в tasks")
 
         if command == '6':
-            tasks_for_save = []
-            for task in tasks:
-                tasks_for_save.append(task.task_to_dict())
-            if not loaded_tasks.save(tasks_for_save):
+            if not loaded_tasks.save(tasks):
                 print("Сохранение данных не выполнено")
                 break
 
