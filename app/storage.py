@@ -1,6 +1,6 @@
 import json
 from app.models import Task
-from app.services import task_from_dict
+
 class MemoryStorage: # для тестов, будет получать на вход список экземпляров класс Task
     def __init__(self, tasks=None):
         self._tasks = list(tasks or [])
@@ -32,7 +32,8 @@ class JsonStorage:
         if not isinstance(data, list):
             raise ValueError("Ожидался список")
 
-        return [task_from_dict(item) for item in data]
+        return [Task.task_from_dict(item) for item in data]
+        # [Task.from_dict(item) for item in data], откуда взять э.к. Task, чтобы вызывать from_dict
     
     def save(self, tasks):
         data = [task.task_to_dict() for task in tasks]
@@ -45,9 +46,9 @@ class JsonStorage:
                     ensure_ascii=False,
                     indent=2
                 )
-            return True
+            return True # Обработка
         except:
-            return False
+            return False # Ошибок
 
         
 

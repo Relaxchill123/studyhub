@@ -1,18 +1,18 @@
 from pathlib import Path
 from app.validators import is_normalized_priority
-from app.services import add_task, find_task, get_stats, mark_done_tasks, get_next_id, get_titles
+from app.services import PlannerService
 from app.exceptions import TaskNotFoundError
 # from app.storage import load_tasks, save_tasks, load_titles, save_titles
 from app.cli import show_menu, get_command  
-from app.storage import JsonStorage
+from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
-# .parent.mkdir(parents=True, exist_ok=True)1
+# .parent.mkdir(parents=True, exist_ok=True)
 
 def run():
-    tasks = []
-    loaded_tasks = JsonStorage(DATA_FILE)
-    tasks = loaded_tasks.load()
+
+    storage = MemoryStorage()
+    services = PlannerService(storage)
     # titles = load_titles(get_titles(tasks))
 
     while True:
@@ -42,27 +42,21 @@ def run():
             #     print("\n Введите корректно приоритет задачи (число от 1 до 5)\n")
             #     continue
             try:
-                add_task(tasks, title, priority, tags)
+                services.add_task(title, priority, tags)
             except ValueError as e:
                 print(f"ERROR {e}")
                 continue
             print("Задача добавлена в tasks")
 
         if command == '6':
-            if not loaded_tasks.save(tasks):
-                print("Сохранение данных не выполнено")
-                break
-
-            print("Программа завершена, данные сохранены корректно")
-            # save_titles(get_titles(tasks))
             break   
 
-        if not tasks:
+        if not storage.load():
             print("\nСпсиок задач - пуст\n")
             continue
         
         if command == '2':
-            for task in tasks:
+            for task in services.get_tasks():
                 print(f"{task}\n")
 
             print()
@@ -75,7 +69,7 @@ def run():
                 continue
 
             try:
-                task = find_task(tasks, int(task_id))
+                task = services.find_task(int(task_id))
             except TaskNotFoundError:
                 print("\nПереданной задачи нет в списке\n")
                 continue
@@ -92,7 +86,7 @@ def run():
                 print("\nID задачи не введен\n")
                 continue
             try:
-                res = mark_done_tasks(tasks, int(task_id))
+                res = services.mark_done_tasks(int(task_id))
             except TaskNotFoundError:
                 print("\nПереданной задачи нет в списке\n")
                 continue
@@ -107,7 +101,7 @@ def run():
             print(res)            
 
         if command == '5':
-            print(get_stats(tasks))
+            print(services.get_stats())
         
 if __name__ == '__main__':
     run()
