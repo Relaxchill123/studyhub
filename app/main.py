@@ -10,7 +10,7 @@ DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 
 def run():
 
-    storage = JsonStorage(DATA_FILE) # 
+    storage = MemoryStorage() # DATA_FILE
     services = PlannerService(storage)
     # titles = load_titles(get_titles(tasks))
 

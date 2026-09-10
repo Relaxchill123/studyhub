@@ -6,7 +6,7 @@ class PlannerService:
     def __init__(self, storage):
         self.storage = storage
 
-    def add_task(self, title, priority, tags): 
+    def add_task(self, title, priority, tags = []): 
         ''' получает list, dict; возвращает str; изменяет tasks'''
         tasks = self.storage.load()
 
@@ -27,6 +27,7 @@ class PlannerService:
         
         tasks.append(task)
         self.storage.save(tasks)
+        return task
     
 
     def find_task(self, task_id, tasks=None):

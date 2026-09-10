@@ -20,7 +20,7 @@
     "id": 5,
     "title": "dasda",
     "priority": 3,
-    "is_done": false,
+    "is_done": true,
     "tags": ""
   },
   {
@@ -38,7 +38,7 @@
     "id": 7,
     "title": "xfdgb",
     "priority": 5,
-    "is_done": false,
+    "is_done": true,
     "tags": [
       "g",
       "f",
