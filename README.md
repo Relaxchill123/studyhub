@@ -16,7 +16,9 @@ python -m venv .venv
 
 .\.venv\Scripts\Activate.ps1
 
-python main.py
+python -m pytest -q 
+
+python -m app.main
 
 ## Контрольный сценарий.
 Шаг 1. Запустите проект командой из README.
