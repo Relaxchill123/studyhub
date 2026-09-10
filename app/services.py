@@ -29,9 +29,10 @@ class PlannerService:
         self.storage.save(tasks)
     
 
-    def find_task(self, task_id):
+    def find_task(self, task_id, tasks=None):
         ''' получает list; возвращает dict/None; побочных эффектов не имеет '''
-        tasks = self.storage.load()
+        if tasks is None:
+            tasks = self.storage.load()
 
         for task in tasks:
             if task_id == task.id:
@@ -41,10 +42,11 @@ class PlannerService:
     def mark_done_tasks(self, task_id):
         ''' получает list; возвращает строку; изменяет tasks'''
         tasks = self.storage.load()
+        task = self.find_task(task_id, tasks)
 
-        task = self.find_task(tasks, task_id)
         if not task.is_done:
             task.mark_done()
+            self.storage.save(tasks)
             return "Отмечена как выполненная"
         return "Задача уже выполнена"
 
@@ -62,6 +64,36 @@ class PlannerService:
     def get_tasks(self):
         return self.storage.load()
 
+    def remove_task(self, task_id):
+        tasks = self.storage.load()
+        task = self.find_task(task_id, tasks)
+        tasks.remove(task) # pop удаляет задачу по переданному индексу, а нам нужно
+        # удалять по полю id
+        self.storage.save(tasks)
+        return f"Задача: {task} - удалена"
+
+    def add_tags(self, task_id, tags):
+        tasks = self.storage.load()
+        task = self.find_task(task_id, tasks)
+        tags_in_task = []
+
+        for tag in tags:
+            if tag not in task.tags: 
+                task.add_tag_to_task(tag)
+            else:
+                tags_in_task.append(tag)
+
+        self.storage.save(tasks)
+        if not tags_in_task:
+            return "Тег(и) успешно добавлены"
+
+        new_tags = [tag for tag in tags if tag not in tags_in_task]
+        
+        return (
+            f"Тег(и): {', '.join(new_tags)} добавлены;\n"
+            f"У задачи с ID: {task_id} тег(и): {', '.join(tags_in_task)} уже существуют"
+        )
+        
 # def get_titles(tasks):
 #     if not tasks:
 #         return []

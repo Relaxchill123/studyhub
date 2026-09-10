@@ -19,6 +19,12 @@ class Task:
         if not 1 <= self.priority <= 5:
             raise ValueError("Приоритет должен быть от 1 до 5")
 
+    def mark_done(self):
+        self.is_done = True
+
+    def add_tag_to_task(self, tag):
+        self.tags.append(tag)
+
     def task_to_dict(self):
         return {
             'id': self.id,
@@ -37,9 +43,6 @@ class Task:
             is_done=task['is_done'],
             tags=task['tags']
         )
-
-    def mark_done(self):
-        self.is_done = True
 
     def is_high_priority(self):
         return self.priority >= 4

@@ -1,4 +1,4 @@
-VALID_COMMANDS = {'1', '2', '3', '4', '5', '6'}
+VALID_COMMANDS = {'1', '2', '3', '4', '5', '6', '7', '8'}
 VALID_PRIORITYS = {'1', '2', '3', '4', '5'}
 
 def validate_command(command):

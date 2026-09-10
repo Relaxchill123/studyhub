@@ -1,19 +1,5 @@
 [
   {
-    "id": 1,
-    "title": "qwe",
-    "priority": 2,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 2,
-    "title": "qwe",
-    "priority": 2,
-    "is_done": false,
-    "tags": []
-  },
-  {
     "id": 3,
     "title": "йцу",
     "priority": 4,
@@ -44,34 +30,21 @@
     "is_done": true,
     "tags": [
       "dfsg",
-      "sdfg"
+      "sdfg",
+      "po"
     ]
   },
   {
     "id": 7,
-    "title": "qwe 43",
+    "title": "xfdgb",
     "priority": 5,
     "is_done": false,
     "tags": [
-      "sfdag",
-      "dfsg"
-    ]
-  },
-  {
-    "id": 8,
-    "title": "sdf",
-    "priority": 4,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 9,
-    "title": "qwer",
-    "priority": 2,
-    "is_done": false,
-    "tags": [
-      "fdgh",
-      "dfghdf"
+      "g",
+      "f",
+      "d",
+      "a",
+      "x"
     ]
   }
 ]
