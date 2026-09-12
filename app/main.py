@@ -10,7 +10,7 @@ DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 
 def run():
 
-    storage = MemoryStorage() # DATA_FILE
+    storage = JsonStorage(DATA_FILE) # 
     services = PlannerService(storage)
     # titles = load_titles(get_titles(tasks))
 
@@ -50,8 +50,12 @@ def run():
         if command == '8':
             break
 
-        if not storage.load():
-            print("\nСпсиок задач - пуст\n")
+        try:
+            if not storage.load():
+                print("\nСпсиок задач - пуст\n")
+                continue
+        except ValueError as e:
+            print(e)
             continue
         
         if command == '2':
