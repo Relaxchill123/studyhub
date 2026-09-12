@@ -1,0 +1,1 @@
+PlannerService использует storage, но не является storage. Создайте коммит refactor: compose planner service with storage.

@@ -2,16 +2,23 @@
 ## Возможности: добавление, просмотр, поиск, завершение задачи и статистика.
 ## Запуск с командами python main.py и py main.py.
 ## Проверка: добавить две задачи, завершить одну, вывести статистику.
+## Данные хранятся в data/tasks.json
 
 
 # На компьтере должен быть установлен Python и Git
 # Для проверки используйте команды python -- version и git --version
 # Запуск
 git clone https://github.com/Relaxchill123/studyhub.git
+
 cd studyhub
+
 python -m venv .venv
+
 .\.venv\Scripts\Activate.ps1
-python main.py
+
+python -m pytest -q 
+
+python -m app.main
 
 ## Контрольный сценарий.
 Шаг 1. Запустите проект командой из README.
