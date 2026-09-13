@@ -1,5 +1,6 @@
 import json
 from app.models import Task
+from app.exceptions import StorageError
 
 class MemoryStorage: # для тестов, будет получать на вход список экземпляров класс Task
     def __init__(self, tasks=None):
@@ -24,7 +25,7 @@ class JsonStorage:
             with self._data_file.open('r', encoding='utf-8') as file:
                 data = json.load(file)
         except json.JSONDecodeError as error:
-            raise ValueError(
+            raise StorageError(
                 f"tasks.json повреждён: строка {error.lineno}"
             ) from error
 

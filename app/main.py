@@ -1,18 +1,15 @@
 from pathlib import Path
-from app.validators import is_normalized_priority
 from app.services import PlannerService
-from app.exceptions import TaskNotFoundError
+from app.exceptions import TaskNotFoundError, StorageError
 from app.cli import show_menu, get_command  
 from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
-# .parent.mkdir(parents=True, exist_ok=True)
 
 def run():
 
     storage = JsonStorage(DATA_FILE) # 
     services = PlannerService(storage)
-    # titles = load_titles(get_titles(tasks))
 
     while True:
         show_menu()
@@ -21,10 +18,6 @@ def run():
 
         if command == '1':
             title = input("Введите задачу: ")
-
-            # if not title:
-            #     print("\nНазвание не может быть пустым\n")
-            #     continue
 
             try:
                 priority = int(input("\nВведите приоритет: ").strip())
@@ -37,12 +30,9 @@ def run():
 
             tags = input("\nВведите теги через пробел: ").split()
 
-            # if not is_normalized_priority(priority):
-            #     print("\n Введите корректно приоритет задачи (число от 1 до 5)\n")
-            #     continue
             try:
                 services.add_task(title, priority, tags)
-            except ValueError as e:
+            except StorageError as e:
                 print(f"ERROR {e}")
                 continue
             print("Задача добавлена в tasks")

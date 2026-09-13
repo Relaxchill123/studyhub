@@ -1,13 +1,12 @@
 from app.exceptions import TaskNotFoundError
 from app.models import Task
-from app.validators import normalize_title
 
 class PlannerService:
     def __init__(self, storage):
         self.storage = storage
 
     def add_task(self, title, priority, tags = []): 
-        ''' получает list, dict; возвращает str; изменяет tasks'''
+        ''' получает str, str, list; возвращает Task; изменяет tasks'''
         tasks = self.storage.load()
 
         if not tasks:
