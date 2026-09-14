@@ -12,6 +12,6 @@ def show_menu():
 def get_command():
     command = input("\nВыберите пункт меню: ").strip()
     if validate_command(command):
-        return command
+        return command 
 
     print("\nВыберите пункт меню корректно (число от 1 до 8)\n")
