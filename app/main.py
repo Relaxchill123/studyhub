@@ -1,18 +1,15 @@
 from pathlib import Path
-from app.validators import is_normalized_priority
 from app.services import PlannerService
-from app.exceptions import TaskNotFoundError
-from app.cli import show_menu, get_command  
+from app.exceptions import TaskNotFoundError, StorageError
+from app.cli import show_menu, get_command, add, is_tasks
 from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
-# .parent.mkdir(parents=True, exist_ok=True)
 
 def run():
 
     storage = JsonStorage(DATA_FILE) # 
     services = PlannerService(storage)
-    # titles = load_titles(get_titles(tasks))
 
     while True:
         show_menu()
@@ -20,43 +17,17 @@ def run():
         command = get_command()
 
         if command == '1':
-            title = input("Введите задачу: ")
+            res = add(services)
+            if res:
+                print(res)
 
-            # if not title:
-            #     print("\nНазвание не может быть пустым\n")
-            #     continue
-
-            try:
-                priority = int(input("\nВведите приоритет: ").strip())
-            except ValueError:
-                print('Ожидалось число')
-                continue
-
-            if not priority:
-                priority = 3
-
-            tags = input("\nВведите теги через пробел: ").split()
-
-            # if not is_normalized_priority(priority):
-            #     print("\n Введите корректно приоритет задачи (число от 1 до 5)\n")
-            #     continue
-            try:
-                services.add_task(title, priority, tags)
-            except ValueError as e:
-                print(f"ERROR {e}")
-                continue
-            print("Задача добавлена в tasks")
+            continue
 
         if command == '8':
             break
 
-        try:
-            if not storage.load():
-                print("\nСпсиок задач - пуст\n")
-                continue
-        except ValueError as e:
-            print(e)
-            continue
+
+        is_tasks(storage)
         
         if command == '2':
             for task in services.get_tasks():

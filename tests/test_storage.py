@@ -1,6 +1,8 @@
+import pytest
 from app.models import Task
 from app.storage import JsonStorage
 
+# @pytest.mark.xfail(reason="реализация присутствует")
 def test_task_correct_save_to_json(tmp_path):
     path = tmp_path / 'tasks.json'
     storage = JsonStorage(path)
