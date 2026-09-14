@@ -1,7 +1,7 @@
 from pathlib import Path
 from app.services import PlannerService
 from app.exceptions import TaskNotFoundError, StorageError
-from app.cli import show_menu, get_command  
+from app.cli import show_menu, get_command, add, is_tasks
 from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
@@ -17,36 +17,17 @@ def run():
         command = get_command()
 
         if command == '1':
-            title = input("Введите задачу: ")
+            res = add(services)
+            if res:
+                print(res)
 
-            try:
-                priority = int(input("\nВведите приоритет: ").strip())
-            except ValueError:
-                print('Ожидалось число')
-                continue
-
-            if not priority:
-                priority = 3
-
-            tags = input("\nВведите теги через пробел: ").split()
-
-            try:
-                services.add_task(title, priority, tags)
-            except StorageError as e:
-                print(f"ERROR {e}")
-                continue
-            print("Задача добавлена в tasks")
+            continue
 
         if command == '8':
             break
 
-        try:
-            if not storage.load():
-                print("\nСпсиок задач - пуст\n")
-                continue
-        except ValueError as e:
-            print(e)
-            continue
+
+        is_tasks(storage)
         
         if command == '2':
             for task in services.get_tasks():

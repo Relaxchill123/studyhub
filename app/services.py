@@ -59,7 +59,8 @@ class PlannerService:
             if task.is_done:
                 done += 1
 
-        return (f"Задач выполнено: {done}; Задач не выполнено: {len(tasks) - done}")
+        return (f"Задач всего: {len(tasks)}"
+                f"Задач выполнено: {done}; Задач не выполнено: {len(tasks) - done}")
 
     def get_tasks(self):
         return self.storage.load()
@@ -91,60 +92,5 @@ class PlannerService:
         
         return (
             f"Тег(и): {', '.join(new_tags)} добавлены;\n"
-            f"У задачи с ID: {task_id} тег(и): {', '.join(tags_in_task)} уже существуют"
+            f"У задачи с ID: {task_id} тег(и) {', '.join(tags_in_task)} уже существуют"
         )
-        
-# def get_titles(tasks):
-#     if not tasks:
-#         return []
-
-#     titles = []
-#     for task in tasks:
-#         if task.get('title'):
-#             titles.append(task['title'])
-
-#     return titles
-
-# def add_task(tasks, title, priority, tags): 
-#     ''' получает list, dict; возвращает str; изменяет tasks'''
-#     task = Task(get_next_id(tasks), title, priority, tags = tags)
-    
-#     tasks.append(task)
-    
-
-
-# def find_task(tasks, task_id):
-#     ''' получает list; возвращает dict/None; побочных эффектов не имеет '''
-#     for task in tasks:
-#         if task_id == task.id:
-#             return task
-#     raise TaskNotFoundError(task_id)
-
-# def mark_done_tasks(tasks, task_id):
-#     ''' получает list; возвращает строку; изменяет tasks'''
-#     task = find_task(tasks, task_id)
-#     if not task.is_done:
-#         task.mark_done()
-#         return "Отмечена как выполненная"
-#     return "Задача уже выполнена"
-
-# def get_stats(tasks):
-#     ''' получает list; возвращает строку; побочных эффектов не имеет'''
-#     done = 0
-#     not_done = 0
-#     for task in tasks:
-#         if task.is_done:
-#             done += 1
-#         else:
-#             not_done +=1
-
-#     return (f"Задач выполнено: {done}; Задач не выполнено: {not_done}")
-
-# def task_from_dict(task):
-#         return Task(
-#             task['id'],
-#             task['title'],
-#             task['priority'],
-#             task['is_done'],
-#             task['tags']
-#         )

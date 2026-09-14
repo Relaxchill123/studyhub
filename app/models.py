@@ -31,7 +31,7 @@ class Task:
             'title': self.title,
             'priority': self.priority,
             'is_done': self.is_done,
-            'tags': self.tags,
+            'tags': list(self.tags),
         }
 
     @classmethod
@@ -41,7 +41,7 @@ class Task:
             title=task['title'],
             priority=task['priority'],
             is_done=task['is_done'],
-            tags=task['tags']
+            tags=list(task['tags'])
         )
 
     def is_high_priority(self):
