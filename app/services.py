@@ -59,7 +59,7 @@ class PlannerService:
             if task.is_done:
                 done += 1
 
-        return (f"Задач всего: {len(tasks)}"
+        return (f"Задач всего: {len(tasks)}\n"
                 f"Задач выполнено: {done}; Задач не выполнено: {len(tasks) - done}")
 
     def get_tasks(self):
