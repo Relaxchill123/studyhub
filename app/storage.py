@@ -17,7 +17,7 @@ class JsonStorage:
     def __init__(self, data_file):
         self._data_file = data_file
         
-    def load(self) -> list[Task]:
+    def load(self) ->  list[Task]:
 
         if not self._data_file.exists():
             return []
@@ -31,16 +31,8 @@ class JsonStorage:
 
 
         if not isinstance(data, list):
-            raise ValueError("Ожидался список")
+            raise StorageError("Корень JSON должен быть списком")
 
-        # res = []
-        # for item in data:
-        #     try:
-        #         Task.task_from_dict(item)
-        #     except StorageError as e:
-        #         raise StorageError(f"{item} - не может создать корректный э.к. Task")
-        
-        # return res
         return [Task.task_from_dict(item) for item in data]
         # [Task.from_dict(item) for item in data], откуда взять э.к. Task, чтобы вызывать from_dict
     
@@ -56,5 +48,5 @@ class JsonStorage:
                     indent=2
                 )
             return True # Обработка
-        except:
-            return False # Ошибок
+        except OSError as error:
+            raise StorageError("Не удалось сохранить задачи") from error
