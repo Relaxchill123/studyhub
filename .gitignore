@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 .idea/
 .vscode/
+.data/
 *.json
 .pytest_cache
 __pycache__

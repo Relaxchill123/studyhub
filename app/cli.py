@@ -15,7 +15,7 @@ def get_command():
     if validate_command(command):
         return command 
 
-    print("\nВыберите пункт меню корректно (число от 1 до 8)\n")
+    return ("\nВыберите пункт меню корректно (число от 1 до 8)\n")
 
 def add(services):
     title = input("Введите задачу: ")
@@ -23,8 +23,7 @@ def add(services):
     try:
         priority = int(input("\nВведите приоритет: ").strip())
     except ValueError:
-        print('Ожидалось число')
-        return False
+        return (False, 'Ожидалось число')
 
     if not priority:
         priority = 3
@@ -34,96 +33,80 @@ def add(services):
     try:
         services.add_task(title, priority, tags)
     except StorageError as e:
-        print(f"ERROR: {e}")
-        return False
+        return (False , e)
     except ValueError as e:
-        print(f"ERROR {e}")
-        return False
-    return ("Задача добавлена в tasks")
+        return (False, e)
+    return (True, "Задача добавлена в tasks")
 
 def show(services):
-    for task in services.get_tasks():
+    for task in services.list_tasks():
         print(f"{task}\n")
 
 def find(services):
     task_id = input('\nВведите ID задачи: ').strip()
     
     if not task_id:
-        print("\nID не введен\n")
-        return False
+        return (False, '\nID не введен\n')
 
     try:
         task = services.find_task(int(task_id))
     except TaskNotFoundError:
-        print("\nПереданной задачи нет в списке\n")
-        return False
+        return (False, "\nПереданной задачи нет в списке\n")
     except ValueError:
-        print("\nОжидалось число")
-        return False
+        return (False, "\nОжидалось число")
 
-    return (f"{task}\n")
+    return (True, task)
 
 def remove(services):
     task_id = input('Введите ID задачи для удаления: ').strip()
     if not task_id:
-        print("\nID задачи не введен\n")
-        return False
+        return (False, "\nID задачи не введен\n")
 
     try:
         res = services.remove_task(int(task_id)) 
     except TaskNotFoundError:
-        print(f'Задачи с ID: {task_id} - нет в списке')
-        return False
+        return (False, f'Задачи с ID: {task_id} - нет в списке')
     except ValueError:
-        print("\nОжидалось число")
-        return False
+        return (False, "\nОжидалось число")
 
-    return res
+    return (True, res)
 
 def done(services):
     task_id = input('Введите ID задачи для изменения статуса: ').strip()
     
     if not task_id:
-        print("\nID задачи не введен\n")
-        return False
+        return (False, "\nID задачи не введен\n")
     try:
         res = services.mark_done_tasks(int(task_id))
     except TaskNotFoundError:
-        print("\nПереданной задачи нет в списке\n")
-        return False
+        return (False,"\nПереданной задачи нет в списке\n")
     except ValueError:
-        print("\nОжидалось число")
-        return False
+        return (False, "\nОжидалось число")
 
     if not res:
-        print("\nЗадачи с переданным ID нет в tasks\n")
-        return False
+        return (False, "\nЗадачи с переданным ID нет в tasks\n")
 
-    return res
+    return (True, res)
 
 def stats(services):
-    return (services.get_stats())
+    return services.get_stats()
 
 def add_tags(services):
     task_id = input('Введите ID задачи для добавления тег(ов): ').strip()
                 
     if not task_id:
-        print("\nID задачи не введен\n")
-        return False
+        return (False, "\nID задачи не введен\n")
 
     tags = input("\nВведите теги через пробел: ").split()
 
     if not tags:
-        print("\nТег(и) для добавления не введены\n")
-        return False
+        return (False, "\nТег(и) для добавления не введены\n")
 
     try:
         res = services.add_tags(int(task_id), tags)
     except TaskNotFoundError:
-        print("\nПереданной задачи нет в списке\n")
-        return False
+        return (False, "\nПереданной задачи нет в списке\n")
     except ValueError:
-        print("\nОжидалось число")
-        return False
+        return (False, "\nОжидалось число")
 
-    return res
+    return (True, res)

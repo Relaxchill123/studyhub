@@ -1,18 +1,1 @@
-[
-  {
-    "id": 4,
-    "title": "ывпыв",
-    "priority": 3,
-    "is_done": false,
-    "tags": []
-  },
-  {
-    "id": 5,
-    "title": "ыва",
-    "priority": 3,
-    "is_done": false,
-    "tags": [
-      "ар"
-    ]
-  }
-]
+[]

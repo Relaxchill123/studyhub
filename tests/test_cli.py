@@ -11,8 +11,8 @@ def test_add_command_smoke(monkeypatch):
 
     result = add(service)
 
-    assert result == "Задача добавлена в tasks"
-    tasks = service.get_tasks()
+    assert result[1] == "Задача добавлена в tasks"
+    tasks = service.list_tasks()
     assert len(tasks) == 1
     assert tasks[0].title == "Python"
     assert tasks[0].priority == 4
