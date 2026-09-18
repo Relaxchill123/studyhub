@@ -2,7 +2,7 @@ import pytest
 from app.storage import JsonStorage
 from app.services import PlannerService
 from app.exceptions import TaskNotFoundError, StorageError
-from app.cli import add, find, remove, done, stats, get_command, show
+from app.cli import add, find, remove, done, stats, get_command, show, search
 
 def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     path = tmp_path / 'data_path.json'
@@ -54,11 +54,15 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     with pytest.raises(StorageError):
         storage.load()
     
-    with pytest.raises(StorageError):
-        service.add_task('', 3)
+    invalid_service = PlannerService(
+    JsonStorage(tmp_path / "valid.json")
+)
 
-    with pytest.raises(StorageError):
-        service.add_task('Python', 6)
+    with pytest.raises(ValueError):
+        invalid_service.add_task("", 3)
+
+    with pytest.raises(ValueError):
+        invalid_service.add_task("Python", 6)
 
     path.write_text("{broken", encoding="utf-8")
 
@@ -84,6 +88,18 @@ def test_cli_commands(tmp_path, monkeypatch, capsys):
     tasks = service.list_tasks()
     assert len(tasks) == 1
     assert tasks[0].title == 'Python'
+
+    answers = iter(["Python"])
+    monkeypatch.setattr(
+        "builtins.input",
+        lambda _: next(answers),
+    )
+
+    result = search(service)
+
+    print(result)
+    assert result[0] is True
+    assert result[1][0].title == "Python"
 
     answers = iter(['1'])
     monkeypatch.setattr("builtins.input", lambda _:next(answers))
@@ -125,8 +141,6 @@ def test_cli_commands(tmp_path, monkeypatch, capsys):
     result = find(service)
 
     assert result[1] == "\nПереданной задачи нет в списке\n"
-
-
 
     # path.write_text("{broken", encoding="utf-8")
     # result = stats(service)
