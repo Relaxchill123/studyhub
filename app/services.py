@@ -32,6 +32,16 @@ class PlannerService:
                 return task
         raise TaskNotFoundError(task_id)
 
+    def search_task(self, title):
+        tasks = self.storage.load()
+        result = []
+
+        for task in tasks:
+            if title in task.title:
+                result.append(task)
+
+        return result
+
     def mark_done_tasks(self, task_id):
         ''' получает list; возвращает строку; изменяет tasks'''
         tasks = self.storage.load()

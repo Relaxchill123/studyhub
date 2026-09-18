@@ -25,30 +25,30 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     assert service.list_tasks() == service.list_tasks()
     
     with pytest.raises(TaskNotFoundError):
-        assert service.find_task(999) == TaskNotFoundError
+        service.find_task(999)
 
     assert service.list_tasks() == new_service.list_tasks()
 
     with pytest.raises(TaskNotFoundError):
-        assert service.remove_task(999) == TaskNotFoundError
+        service.remove_task(999)
 
     assert service.list_tasks() == new_service.list_tasks()
 
     with pytest.raises(TaskNotFoundError):
-        assert service.mark_done_tasks(999) == TaskNotFoundError
+        service.mark_done_tasks(999)
 
     assert service.list_tasks() == new_service.list_tasks()
 
     path.write_text("{broken", encoding="utf-8")
 
     with pytest.raises(StorageError):
-            assert storage.load()
+        storage.load()
     
     with pytest.raises(StorageError):
-        assert service.add_task('', 3)
+        service.add_task('', 3)
 
     with pytest.raises(StorageError):
-        assert service.add_task('Python', 6)
+        service.add_task('Python', 6)
 
 def test_cli_commands(tmp_path, monkeypatch):
     path = tmp_path / 'data_path'

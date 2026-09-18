@@ -2,7 +2,7 @@ from app.validators import validate_command
 from app.exceptions import TaskNotFoundError, StorageError
 
 def show_menu():
-    menu = ['Добавить задачу', 'Показать задачи', 'Найти задачу',
+    menu = ['Добавить задачу', 'Показать задачи', 'Найти задачу по id', 'Найти задачу по названию',
             'Удалить задачу', 'Отметить выполненную задачу', 'Показать статистику',
             'Добавить тег(и)', 'Выйти']
 
@@ -15,7 +15,7 @@ def get_command():
     if validate_command(command):
         return command 
 
-    return ("\nВыберите пункт меню корректно (число от 1 до 8)\n")
+    return ("\nВыберите пункт меню корректно (число от 1 до 9)\n")
 
 def add(services):
     title = input("Введите задачу: ")
@@ -56,6 +56,21 @@ def find(services):
         return (False, "\nОжидалось число")
 
     return (True, task)
+
+def search(services):
+    title = input("\nВведите название для поиска: ").strip()
+
+    if not title:
+        return (False, '\nID не введен\n')
+
+    result = services.search_task(title)
+
+    if result:
+        for task in result:
+            print(task)
+        return (True, result)
+    else:
+        return (False, 'Задач(и) с таким назавнием - нет')
 
 def remove(services):
     task_id = input('Введите ID задачи для удаления: ').strip()

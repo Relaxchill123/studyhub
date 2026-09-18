@@ -1,7 +1,7 @@
 from pathlib import Path
 from app.services import PlannerService
-from app.exceptions import TaskNotFoundError, StorageError
-from app.cli import show_menu, get_command, add, show, find, remove, done, stats, add_tags
+from app.exceptions import StorageError
+from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search
 from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
@@ -30,7 +30,7 @@ def run():
             print(res[1])
             continue
 
-        if command == '8':
+        if command == '9':
             break
 
         if not services.list_tasks():
@@ -50,6 +50,13 @@ def run():
             continue
 
         if command == '4':
+            res = search(services)
+            if not res[0]:
+                print(res[1])
+                continue
+            continue
+
+        if command == '5':
             res = remove(services)
             if res[0]:
                 print(res[1])
@@ -57,7 +64,7 @@ def run():
             print(res[1])
             continue
 
-        if command == '5':
+        if command == '6':
             res = done(services)
             if res[0]:
                 print(res[1])
@@ -65,11 +72,11 @@ def run():
             print(res[1])
             continue
 
-        if command == '6':
+        if command == '7':
             print(stats(services))
             continue
 
-        if command == '7':
+        if command == '8':
             if res[0]:
                 print(res[1])
                 continue
