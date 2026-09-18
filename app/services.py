@@ -5,22 +5,15 @@ class PlannerService:
     def __init__(self, storage):
         self.storage = storage
 
-    def add_task(self, title, priority, tags = []): 
+    def add_task(self, title, priority, tags=None):
         ''' получает str, str, list; возвращает Task; изменяет tasks'''
+        tags = list(tags or [])
         tasks = self.storage.load()
 
         if not tasks:
             next_id = 1
-        
-        elif len(tasks) == 1:
-            next_id = 2
-
         else:
-            next_id = tasks[0].id
-            for task in tasks:
-                if task.id > next_id:
-                    next_id = task.id
-            next_id = next_id + 1
+            next_id = max([task.id for task in tasks]) + 1
 
         task = Task(next_id, title, priority, tags = tags)
         
@@ -30,7 +23,7 @@ class PlannerService:
     
 
     def find_task(self, task_id, tasks=None):
-        ''' получает list; возвращает dict/None; побочных эффектов не имеет '''
+        ''' получает int, list; возвращает dict; побочных эффектов не имеет '''
         if tasks is None:
             tasks = self.storage.load()
 
@@ -38,6 +31,16 @@ class PlannerService:
             if task_id == task.id:
                 return task
         raise TaskNotFoundError(task_id)
+
+    def search_task(self, title):
+        tasks = self.storage.load()
+        result = []
+
+        for task in tasks:
+            if title in task.title:
+                result.append(task)
+
+        return result
 
     def mark_done_tasks(self, task_id):
         ''' получает list; возвращает строку; изменяет tasks'''
@@ -59,17 +62,16 @@ class PlannerService:
             if task.is_done:
                 done += 1
 
-        return (f"Задач всего: {len(tasks)}"
+        return (f"Задач всего: {len(tasks)}\n"
                 f"Задач выполнено: {done}; Задач не выполнено: {len(tasks) - done}")
 
-    def get_tasks(self):
+    def list_tasks(self):
         return self.storage.load()
 
     def remove_task(self, task_id):
         tasks = self.storage.load()
         task = self.find_task(task_id, tasks)
-        tasks.remove(task) # pop удаляет задачу по переданному индексу, а нам нужно
-        # удалять по полю id
+        tasks.remove(task)
         self.storage.save(tasks)
         return f"Задача: {task} - удалена"
 
@@ -92,5 +94,5 @@ class PlannerService:
         
         return (
             f"Тег(и): {', '.join(new_tags)} добавлены;\n"
-            f"У задачи с ID: {task_id} тег(и) {', '.join(tags_in_task)} уже существуют"
+            f"У задачи с ID: {task_id} тег(и): {', '.join(tags_in_task)} уже существуют"
         )
