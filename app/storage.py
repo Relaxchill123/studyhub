@@ -35,14 +35,10 @@ class JsonStorage:
 
         try:
             return [Task.task_from_dict(item) for item in data]
-        except KeyError as error:
+        except (KeyError, ValueError, TypeError) as error:
             raise StorageError(
-                f"В файле json.txt, у задачи отсутствует обязательный ключ(и) - {' ,'.join([e for e in error.args])}"
+                "Некорректная запись задачи в JSON"
             ) from error
-        except (ValueError, TypeError) as error:
-            raise StorageError(
-                f"В файле json.txt, задача №{error.args[1]} передана с ошибкой: {error.args[0]}"
-            )
     
     def save(self, tasks):
         data = [task.task_to_dict() for task in tasks]

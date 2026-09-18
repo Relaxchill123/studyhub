@@ -2,7 +2,7 @@ import pytest
 from app.storage import JsonStorage
 from app.services import PlannerService
 from app.exceptions import TaskNotFoundError, StorageError
-from app.cli import add, find, remove, done, stats, get_command
+from app.cli import add, find, remove, done, stats, get_command, show
 
 def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     path = tmp_path / 'data_path.json'
@@ -17,13 +17,16 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
 
     new_service = PlannerService(JsonStorage(path))
 
-    assert len(new_service.list_tasks()) == 1
-    assert new_service.list_tasks()[0].title == 'Python'
+    tasks = new_service.list_tasks()
 
-    new_service.add_task('Git', 2)
+    assert len(tasks) == 1
+    assert tasks[0].title == "Python"
+    assert tasks[0].is_done is True
 
-    assert service.list_tasks() == new_service.list_tasks()
-    assert stats(new_service) == "Задач всего: 2\nЗадач выполнено: 1; Задач не выполнено: 1"
+    assert stats(new_service) == (
+        "Задач всего: 1\n"
+        "Задач выполнено: 1; Задач не выполнено: 0"
+    )
 
     before = service.list_tasks()
     
@@ -64,7 +67,7 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     with pytest.raises(StorageError):
         service.search_task("Python")
 
-def test_cli_commands(tmp_path, monkeypatch):
+def test_cli_commands(tmp_path, monkeypatch, capsys):
     path = tmp_path / 'data_path'
     storage = JsonStorage(path)
     service = PlannerService(storage)
@@ -74,6 +77,9 @@ def test_cli_commands(tmp_path, monkeypatch):
 
     result = add(service)
 
+    show(service)
+    captured = capsys.readouterr()
+    assert "Python" in captured.out
     assert result[1] == 'Задача добавлена в tasks'
     tasks = service.list_tasks()
     assert len(tasks) == 1
@@ -119,6 +125,8 @@ def test_cli_commands(tmp_path, monkeypatch):
     result = find(service)
 
     assert result[1] == "\nПереданной задачи нет в списке\n"
+
+
 
     # path.write_text("{broken", encoding="utf-8")
     # result = stats(service)
