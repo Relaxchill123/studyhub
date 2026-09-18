@@ -13,6 +13,6 @@ def test_task_correct_save_to_json(tmp_path):
     ]
 
     storage.save(tasks)
-    loaded = storage.load()
+    loaded = JsonStorage(path)
 
-    assert loaded == tasks
+    assert loaded.load() == tasks

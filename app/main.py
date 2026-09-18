@@ -1,7 +1,7 @@
 from pathlib import Path
 from app.services import PlannerService
 from app.exceptions import StorageError
-from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search
+from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search, add_tags
 from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
@@ -77,6 +77,7 @@ def run():
             continue
 
         if command == '8':
+            res = add_tags(services)
             if res[0]:
                 print(res[1])
                 continue

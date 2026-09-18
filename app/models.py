@@ -14,10 +14,10 @@ class Task:
         self.title = self.title.strip()
 
         if not self.title:
-            raise ValueError("Название не может быть пустым")
+            raise ValueError("Некоректное название. Название не может быть пустым", self.id)
 
         if not 1 <= self.priority <= 5:
-            raise ValueError("Приоритет должен быть от 1 до 5")
+            raise ValueError("Некоректный приоритет. Приоритет должен быть от 1 до 5", self.id)
 
     def mark_done(self):
         self.is_done = True
@@ -51,42 +51,3 @@ class Task:
         mark = "x" if self.is_done else " "
         tags = f"| Тэги: {', '.join(self.tags)}" if self.tags else ''
         return f"[{mark}] {self.id}. {self.title} {tags}" 
-
-# @property
-# def id(self):
-#     return self._id
-
-# @property
-# def title(self):
-#     return self._title
-
-# @title.setter
-# def title(self, value):
-#     cleaned = value.strip()
-#     if not cleaned:
-#         raise ValueError("Название не может быть пустым")
-#     self._title = cleaned
-
-# @property
-# def priority(self):
-#     return self._priority
-
-# @priority.setter
-# def priority(self, value):
-#     try:
-#         self._priority = int(value)
-#     except ValueError as e:
-#         raise ValueError("Приоритет должен быть целым числом")
-
-#     if not 1 <= self._priority <= 5:
-#         raise ValueError("Приоритет должен быть от 1 до 5")
-
-#     self._priority = value
-
-# @property
-# def is_done(self):
-#     return self._is_done
-
-# @property
-# def tags(self):
-#     return self._tags

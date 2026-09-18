@@ -18,26 +18,33 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     new_service = PlannerService(JsonStorage(path))
 
     assert len(new_service.list_tasks()) == 1
-    assert service.list_tasks()[0].title == 'Python'
+    assert new_service.list_tasks()[0].title == 'Python'
 
     new_service.add_task('Git', 2)
 
-    assert service.list_tasks() == service.list_tasks()
+    assert service.list_tasks() == new_service.list_tasks()
+    assert stats(new_service) == "Задач всего: 2\nЗадач выполнено: 1; Задач не выполнено: 1"
+
+    before = service.list_tasks()
     
     with pytest.raises(TaskNotFoundError):
         service.find_task(999)
 
-    assert service.list_tasks() == new_service.list_tasks()
+    # assert service.list_tasks() == new_service.list_tasks()
 
     with pytest.raises(TaskNotFoundError):
         service.remove_task(999)
 
-    assert service.list_tasks() == new_service.list_tasks()
+    # assert service.list_tasks() == new_service.list_tasks()
 
     with pytest.raises(TaskNotFoundError):
         service.mark_done_tasks(999)
 
-    assert service.list_tasks() == new_service.list_tasks()
+    # assert service.list_tasks() == new_service.list_tasks()
+
+    after = service.list_tasks()
+
+    assert before == after
 
     path.write_text("{broken", encoding="utf-8")
 
@@ -49,6 +56,13 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
 
     with pytest.raises(StorageError):
         service.add_task('Python', 6)
+
+    path.write_text("{broken", encoding="utf-8")
+
+    service = PlannerService(JsonStorage(path))
+
+    with pytest.raises(StorageError):
+        service.search_task("Python")
 
 def test_cli_commands(tmp_path, monkeypatch):
     path = tmp_path / 'data_path'
@@ -97,7 +111,7 @@ def test_cli_commands(tmp_path, monkeypatch):
 
     result = get_command()
 
-    assert result == "\nВыберите пункт меню корректно (число от 1 до 8)\n"
+    assert result == "\nВыберите пункт меню корректно (число от 1 до 9)\n"
 
     answers = iter(['999'])
     monkeypatch.setattr("builtins.input", lambda _:next(answers))
