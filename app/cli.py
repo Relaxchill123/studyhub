@@ -2,7 +2,7 @@ from app.validators import validate_command
 from app.exceptions import TaskNotFoundError, StorageError
 
 def show_menu():
-    menu = ['Добавить задачу', 'Показать задачи', 'Найти задачу',
+    menu = ['Добавить задачу', 'Показать задачи', 'Найти задачу по id', 'Найти задачу по названию',
             'Удалить задачу', 'Отметить выполненную задачу', 'Показать статистику',
             'Добавить тег(и)', 'Выйти']
 
@@ -15,7 +15,7 @@ def get_command():
     if validate_command(command):
         return command 
 
-    print("\nВыберите пункт меню корректно (число от 1 до 8)\n")
+    return ("\nВыберите пункт меню корректно (число от 1 до 9)\n")
 
 def add(services):
     title = input("Введите задачу: ")
@@ -23,8 +23,7 @@ def add(services):
     try:
         priority = int(input("\nВведите приоритет: ").strip())
     except ValueError:
-        print('Ожидалось число')
-        return False
+        return (False, 'Ожидалось число')
 
     if not priority:
         priority = 3
@@ -34,20 +33,95 @@ def add(services):
     try:
         services.add_task(title, priority, tags)
     except StorageError as e:
-        print(f"ERROR {e}")
-        return False
+        return (False , e)
     except ValueError as e:
-        print(f"ERROR {e}")
-        return False
-    return ("Задача добавлена в tasks")
+        return (False, e)
+    return (True, "Задача добавлена в tasks")
 
-def is_tasks(storage):
+def show(services):
+    for task in services.list_tasks():
+        print(f"{task}\n")
+
+def find(services):
+    task_id = input('\nВведите ID задачи: ').strip()
+    
+    if not task_id:
+        return (False, '\nID не введен\n')
+
     try:
-        if not storage.load():
-            print("\nСпсиок задач - пуст\n")
-            return False
-    except StorageError as e:
-        print(e)
-        return False
+        task = services.find_task(int(task_id))
+    except TaskNotFoundError:
+        return (False, "\nПереданной задачи нет в списке\n")
+    except ValueError:
+        return (False, "\nОжидалось число")
 
-    return True
+    return (True, task)
+
+def search(services):
+    title = input("\nВведите название для поиска: ").strip()
+
+    if not title:
+        return (False, '\nID не введен\n')
+
+    result = services.search_task(title)
+
+    if result:
+        for task in result:
+            print(task)
+        return (True, result)
+    else:
+        return (False, 'Задач(и) с таким назавнием - нет')
+
+def remove(services):
+    task_id = input('Введите ID задачи для удаления: ').strip()
+    if not task_id:
+        return (False, "\nID задачи не введен\n")
+
+    try:
+        res = services.remove_task(int(task_id)) 
+    except TaskNotFoundError:
+        return (False, f'Задачи с ID: {task_id} - нет в списке')
+    except ValueError:
+        return (False, "\nОжидалось число")
+
+    return (True, res)
+
+def done(services):
+    task_id = input('Введите ID задачи для изменения статуса: ').strip()
+    
+    if not task_id:
+        return (False, "\nID задачи не введен\n")
+    try:
+        res = services.mark_done_tasks(int(task_id))
+    except TaskNotFoundError:
+        return (False,"\nПереданной задачи нет в списке\n")
+    except ValueError:
+        return (False, "\nОжидалось число")
+
+    if not res:
+        return (False, "\nЗадачи с переданным ID нет в tasks\n")
+
+    return (True, res)
+
+def stats(services):
+    return services.get_stats()
+
+def add_tags(services):
+    task_id = input('Введите ID задачи для добавления тег(ов): ').strip()
+                
+    if not task_id:
+        return (False, "\nID задачи не введен\n")
+
+    tags = input("\nВведите теги через пробел: ").split()
+
+    if not tags:
+        return (False, "\nТег(и) для добавления не введены\n")
+
+    try:
+        res = services.add_tags(int(task_id), tags)
+    except TaskNotFoundError:
+        return (False, "\nПереданной задачи нет в списке\n")
+    except ValueError:
+        return (False, "\nОжидалось число")
+
+    return (True, res)
