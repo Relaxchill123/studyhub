@@ -1,0 +1,80 @@
+{
+  "info": {
+    "_postman_id": "864c9d79-1083-44bd-a7ce-2f1fcfa41153",
+    "name": "StudyHub HTTP Lab",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "34262657"
+  },
+  "item": [
+    {
+      "name": "Read query from Echo",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"check course\", function () {\r\n    var jsonData = pm.response.json();\r\n    pm.expect(jsonData.args.course).to.eql(\"python\");\r\n});\r\n\r\npm.test(\"block = 10\", function () {\r\n    const json = pm.response.json();\r\n    pm.expect(Number(json.args.block)).to.eql(23);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/get?course=python&block=10",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "get"
+          ],
+          "query": [
+            {
+              "key": "course",
+              "value": "python"
+            },
+            {
+              "key": "block",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send JSON to Echo",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\r\n    {\r\n        \"title\": \"Изучить HTTP\",\r\n        \"priority\": 4\r\n    }\r\n]",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/post",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "post"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": ""
+    }
+  ]
+}

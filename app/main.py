@@ -9,7 +9,7 @@ app = FastAPI(title="StudyHub Planner API")
 
 @app.get("/health")
 def health ():
-    return {"status ": "ok"}
+    return {"status": "ok"}
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 

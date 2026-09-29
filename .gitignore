@@ -4,6 +4,6 @@ __pycache__/
 .idea/
 .vscode/
 .data/
-*.json
+tasks.json
 .pytest_cache
 __pycache__
