@@ -13,6 +13,10 @@ git clone https://github.com/Relaxchill123/studyhub.git
 
 cd studyhub
 
+pip install -r requirements.txt
+
+python -m uvicorn app.main:app --reload (выполняется из cd studyhub)
+
 python -m venv .venv
 
 .venv\Scripts\Activate.ps1
