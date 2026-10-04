@@ -61,9 +61,7 @@ class PlannerService:
         for task in tasks:
             if task.is_done:
                 done += 1
-
-        return (f"Задач всего: {len(tasks)}\n"
-                f"Задач выполнено: {done}; Задач не выполнено: {len(tasks) - done}")
+        return {'all': len(tasks), 'open': len(tasks) - done, 'done': done}
 
     def list_tasks(self):
         return self.storage.load()
