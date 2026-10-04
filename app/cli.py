@@ -104,7 +104,9 @@ def done(services):
     return (True, res)
 
 def stats(services):
-    return services.get_stats()
+    res = services.get_stats()
+    return (f"Задач всего: {res['all']}\n"
+            f"Задач не выполнено: {res['open']}; Задач выполнено: {res['done']}")
 
 def add_tags(services):
     task_id = input('Введите ID задачи для добавления тег(ов): ').strip()
