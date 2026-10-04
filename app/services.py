@@ -30,7 +30,7 @@ class PlannerService:
         for task in tasks:
             if task_id == task.id:
                 return task
-        raise TaskNotFoundError(task_id)
+        raise TaskNotFoundError()
 
     def search_task(self, title):
         tasks = self.storage.load()
