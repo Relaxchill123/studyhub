@@ -3,13 +3,6 @@ from app.services import PlannerService
 from app.exceptions import StorageError
 from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search, add_tags
 from app.storage import JsonStorage, MemoryStorage
-# from fastapi import FastAPI
-
-# app = FastAPI(title="StudyHub Planner API")
-
-# @app.get("/health")
-# def health ():
-#     return {"status": "ok"}
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 
