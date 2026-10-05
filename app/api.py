@@ -50,8 +50,13 @@ def read_task(task_id: int):
 @app.post("/tasks", status_code=201)
 def post_task(payload: TaskCreate):
     try:
-        app.state.planner.add_task(payload.title, payload.priority)
+        task = app.state.planner.add_task(payload.title, payload.priority)
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
-    return app.state.planner.find_task
+    return {
+        'id': task.id,
+        'title': task.title,
+        'priority': task.priority,
+        'is_done': task.is_done,
+    }

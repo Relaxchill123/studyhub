@@ -44,6 +44,44 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Create task in Planner",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Ознакомится с Pydantic\",\r\n    \"priority\": 4\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            ""
+          ],
+          "query": [
+            {
+              "key": "title",
+              "value": "Ознакомится с Pydantic",
+              "disabled": true
+            },
+            {
+              "key": "priority",
+              "value": "4",
+              "disabled": true
+            }
+          ]
+        }
+      },
+      "response": []
     }
   ],
   "variable": [
