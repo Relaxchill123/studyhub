@@ -94,3 +94,19 @@ class PlannerService:
             f"Тег(и): {', '.join(new_tags)} добавлены;\n"
             f"У задачи с ID: {task_id} тег(и): {', '.join(tags_in_task)} уже существуют"
         )
+
+    def select_tasks(self,
+                    is_done: bool | None = None,
+                    sort_desc=False,
+                    limit=10) -> list[Task]:
+        tasks = self.storage.load()
+        res_tasks = []
+
+        for task in tasks:
+            if is_done is not None:
+                if task.is_done == is_done:
+                    res_tasks.append(task)
+            else:
+                res_tasks = tasks.copy()
+
+        return sorted(res_tasks, key=lambda x: x.id,reverse=sort_desc)[:limit]
