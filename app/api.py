@@ -27,7 +27,18 @@ def tasks(
     limit: int = Query(default=10, ge=1, le=50),
     sort_desc: bool = False):
 
-    return app.state.planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc)
+    public_tasks =[]
+
+    for task in app.state.planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc):
+        public_tasks.append({
+            'id': task.id,
+            'title': task.title,
+            'priority': task.priority,
+            'is_done': task.is_done,
+        })
+
+    return public_tasks
+
 
 @app.get("/stats")
 def stats():
