@@ -99,14 +99,14 @@ class PlannerService:
                     is_done: bool | None = None,
                     sort_desc=False,
                     limit=10) -> list[Task]:
-        tasks = self.storage.load()
+        tasks = self.list_tasks()
         res_tasks = []
 
-        for task in tasks:
-            if is_done is not None:
+        if is_done is not None:
+            for task in tasks:
                 if task.is_done == is_done:
                     res_tasks.append(task)
-            else:
-                res_tasks = tasks.copy()
+
+        res_tasks = tasks.copy()
 
         return sorted(res_tasks, key=lambda x: x.id,reverse=sort_desc)[:limit]

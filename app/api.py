@@ -1,14 +1,21 @@
 from fastapi import FastAPI, HTTPException, Query
 from app.main import build_service
 from app.exceptions import TaskNotFoundError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 app = FastAPI()
 app.state.planner = build_service()
 
 class TaskCreate(BaseModel):
-    title: str
-    priority: int
+    title: str = Field(min_length=2, max_length=120)
+    priority: int = Field(ge=1, le=5)
+
+    @field_validator("title", mode="before")
+    @classmethod
+    def normalize_title(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
 @app.get("/health")
 def health():
@@ -20,7 +27,18 @@ def tasks(
     limit: int = Query(default=10, ge=1, le=50),
     sort_desc: bool = False):
 
-    return app.state.planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc)
+    public_tasks =[]
+
+    for task in app.state.planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc):
+        public_tasks.append({
+            'id': task.id,
+            'title': task.title,
+            'priority': task.priority,
+            'is_done': task.is_done,
+        })
+
+    return public_tasks
+
 
 @app.get("/stats")
 def stats():
