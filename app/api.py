@@ -1,27 +1,16 @@
 from fastapi import FastAPI, HTTPException, Query
 from app.main import build_service
 from app.exceptions import TaskNotFoundError
-from pydantic import BaseModel, Field, field_validator
+from app.schemas import TaskCreate, TaskRead
 
 app = FastAPI()
 app.state.planner = build_service()
-
-class TaskCreate(BaseModel):
-    title: str = Field(min_length=2, max_length=120)
-    priority: int = Field(ge=1, le=5)
-
-    @field_validator("title", mode="before")
-    @classmethod
-    def normalize_title(cls, value):
-        if isinstance(value, str):
-            return value.strip()
-        return value
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-@app.get("/tasks")
+@app.get("/tasks", response_model=list[TaskRead])
 def tasks(
     is_done: bool = None,
     limit: int = Query(default=10, ge=1, le=50),
@@ -39,7 +28,6 @@ def tasks(
 
     return public_tasks
 
-
 @app.get("/stats")
 def stats():
     stats = app.state.planner.get_stats()
@@ -49,7 +37,7 @@ def stats():
         'done': stats['done'],
     }
 
-@app.get("/tasks/{task_id}")
+@app.get("/tasks/{task_id}", response_model=TaskRead)
 def read_task(task_id: int):
     try:
         task = app.state.planner.find_task(task_id)
@@ -65,7 +53,7 @@ def read_task(task_id: int):
             detail='Task not found',
         ) from error
 
-@app.post("/tasks", status_code=201)
+@app.post("/tasks", status_code=201, response_model=TaskRead)
 def post_task(payload: TaskCreate):
     try:
         task = app.state.planner.add_task(payload.title, payload.priority)
