@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 
 class TaskCreate(BaseModel):
-    title: str = Field(min_length=2, max_length=120)
+    title: str = Field(min_length=1, max_length=120)
     priority: int = Field(ge=1, le=5)
 
     @field_validator("title", mode="before")

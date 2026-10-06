@@ -103,10 +103,8 @@ class PlannerService:
         res_tasks = []
 
         if is_done is not None:
-            for task in tasks:
-                if task.is_done == is_done:
-                    res_tasks.append(task)
-
-        res_tasks = tasks.copy()
+            res_tasks = list(filter(lambda task: task.is_done == is_done, tasks))
+        else:
+            res_tasks = tasks.copy()
 
         return sorted(res_tasks, key=lambda x: x.id,reverse=sort_desc)[:limit]
