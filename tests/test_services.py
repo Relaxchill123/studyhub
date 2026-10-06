@@ -72,15 +72,14 @@ def test_new_id_task(tmp_path):
     assert by_id[8].is_done is False
     assert by_id[8].tags == []
 
-    def test_uncorrect_json_file(tmp_path, ra):
-        path = tmp_path / 'data_path'
-        path.write_text("{broken", encoding="utf-8")
+def test_uncorrect_json_file(tmp_path):
+    path = tmp_path / 'data_path'
+    path.write_text("{broken", encoding="utf-8")
 
-        storage = JsonStorage(path)
-        service = PlannerService(storage)
+    storage = JsonStorage(path)
+    service = PlannerService(storage)
 
-        with pytest.raises(StorageError):
-            service.list_tasks()
+    with pytest.raises(StorageError):
+        service.list_tasks()
 
-        assert service.list_tasks() != []
-        assert path.read_text(encoding="utf-8") == '{broken'
+    assert path.read_text(encoding="utf-8") == '{broken'
