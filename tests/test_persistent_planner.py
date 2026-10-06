@@ -25,7 +25,7 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
 
     assert stats(new_service) == (
         "Задач всего: 1\n"
-        "Задач выполнено: 1; Задач не выполнено: 0"
+        "Задач не выполнено: 0; Задач выполнено: 1"
     )
 
     before = service.list_tasks()
@@ -119,7 +119,8 @@ def test_cli_commands(tmp_path, monkeypatch, capsys):
 
     result = stats(service)
 
-    assert result == "Задач всего: 1\nЗадач выполнено: 1; Задач не выполнено: 0"
+    print(result)
+    assert result == "Задач всего: 1\nЗадач не выполнено: 0; Задач выполнено: 1"
 
     answers = iter(['1'])
     monkeypatch.setattr("builtins.input", lambda _:next(answers))
