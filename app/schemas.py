@@ -16,3 +16,20 @@ class TaskRead(BaseModel):
     title: str
     priority: int
     is_done: bool
+
+class TaskUpdate(BaseModel):
+    title: str = Field(min_length=1, max_length=120)
+    priority: int = Field(ge=1, le=5)
+    is_done: bool
+
+    @field_validator("title", mode='before')
+    @classmethod
+    def normalize_title(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+class TaskPatch(BaseModel):
+    title: str | None = None
+    priority: int | None = None
+    is_done: bool | None = None

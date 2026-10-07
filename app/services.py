@@ -108,3 +108,29 @@ class PlannerService:
             res_tasks = tasks.copy()
 
         return sorted(res_tasks, key=lambda x: x.id,reverse=sort_desc)[:limit]
+
+    def replace_task(self, task_id, title, priority, is_done):
+        task = self.find_task(task_id)
+        self.remove_task(task.id)
+        replace_task = Task(task.id, title, priority, is_done, task.tags)
+        tasks = self.list_tasks()
+        tasks.append(replace_task)
+        self.storage.save(tasks)
+        return replace_task
+
+    def patch_task(self, task_id, title=None, priority=None, is_done=None):
+        task = self.find_task(task_id)
+        if title is not None:
+            task.title = title
+
+        if priority is not None:
+            task.priority = priority
+
+        if is_done is not None:
+            task.is_done = is_done
+
+        self.remove_task(task_id)
+        tasks = self.list_tasks()
+        tasks.append(task)
+        self.storage.save(tasks)
+        return task
