@@ -30,8 +30,8 @@ class TaskUpdate(BaseModel):
         return value
 
 class TaskPatch(BaseModel):
-    title: str | None = Field(min_length=1, max_length=120)
-    priority: int | None = Field(ge=1, le=5)
+    title: str | None = Field(default=None, min_length=1, max_length=120)
+    priority: int | None = Field(default=None, ge=1, le=5)
     is_done: bool | None = None
 
     @field_validator("title", mode='before')

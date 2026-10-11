@@ -117,28 +117,27 @@ class PlannerService:
         # проверяются в models.py в __post_init__
         tasks = self.list_tasks()
         index_task_for_replace = tasks.index(task)
-        tasks[index_task_for_replace] = task
+        tasks[index_task_for_replace] = replace_task
         self.storage.save(tasks)
         
         return replace_task
 
     def patch_task(self, task_id, title=None, priority=None, is_done=None):
-        task = self.find_task(task_id)
-        task_copy = task.task_to_dict().copy()
+        tasks = self.list_tasks()
+        task = self.find_task(task_id, tasks)
 
-        if title is not None:
-            task.title = title
+        if title is None and priority is None and is_done is None:
+            return task
 
-        if priority is not None:
-            task.priority = priority
+        updated_task = Task(
+            task.id,
+            task.title if title is None else title,
+            task.priority if priority is None else priority,
+            task.is_done if is_done is None else is_done,
+            task.tags.copy(),
+        )
 
-        if is_done is not None:
-            task.is_done = is_done
-
-        if task_copy != task:
-            self.remove_task(task_id)
-            tasks = self.list_tasks()
-            tasks.append(task)
-            self.storage.save(tasks)
-
-        return task
+        index = tasks.index(task)
+        tasks[index] = updated_task
+        self.storage.save(tasks)
+        return updated_task

@@ -89,15 +89,21 @@ def test_replace_task(tmp_path):
     
     storage = JsonStorage(path)
     storage.save([
-            Task(2, "Ознакомиться с Pydantic", 4, tags=['progremming']),
+            Task(2, "Ознакомиться с Pydantic", 4, tags=['programming']),
         ])
     
     service = PlannerService(storage)
     service.replace_task(2, 'Освоить pytest', 5, False)
 
-    second_service = PlannerService(storage)
-    assert service.list_tasks()[0].id == second_service.list_tasks()[0].id
-    assert service.list_tasks()[0].tags == second_service.list_tasks()[0].tags
+    saved = PlannerService(JsonStorage(path)).list_tasks()[0]
+
+    assert (saved.id, saved.title, saved.priority, saved.is_done) == (
+        2,
+        "Освоить pytest",
+        5,
+        False,
+    )
+    assert saved.tags == ["programming"]
 
 def test_patch_task(tmp_path):
     path = tmp_path / 'data_path'
