@@ -154,11 +154,15 @@ def test_delete_task(tmp_path):
     assert new_service.get_stats() == {'all': 1, 'open': 1, 'done': 0}
     assert service.get_stats() == new_service.get_stats()
 
+    service.add_task("Решить задачу 5 на литкод", 4, tags=['programming', 'leetcode'])
     service.remove_task(task.id)
 
-    assert new_service.get_stats() == {'all': 0, 'open': 0, 'done': 0}
+    assert new_service.get_stats() == {'all': 1, 'open': 1, 'done': 0}
     assert service.get_stats() == new_service.get_stats()
+    assert service.list_tasks()[0].tags == ['programming', 'leetcode']
 
     with pytest.raises(TaskNotFoundError):
         service.find_task(task.id)
+
+    with pytest.raises(TaskNotFoundError):
         service.remove_task(task.id)
