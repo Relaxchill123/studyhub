@@ -120,8 +120,12 @@ def test_patch_task(tmp_path):
     new_service = PlannerService(storage)
     assert new_service.list_tasks()[0].is_done == True
 
+    service.patch_task(2,is_done=False)
+    assert new_service.list_tasks()[0].is_done == False
+
     service.patch_task(2)
     with pytest.raises(TaskNotFoundError):
         service.patch_task(8, is_done=True)
+        
 
     assert service.list_tasks() == new_service.list_tasks()
