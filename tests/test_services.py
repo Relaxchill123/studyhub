@@ -110,7 +110,7 @@ def test_patch_task(tmp_path):
         
     storage = JsonStorage(path)
     storage.save([
-            Task(2, "Ознакомиться с Pydantic", 4, tags=['progremming']),
+            Task(2, "Ознакомиться с Pydantic", 4, tags=['programming']),
         ])
     
     
@@ -129,3 +129,36 @@ def test_patch_task(tmp_path):
         
 
     assert service.list_tasks() == new_service.list_tasks()
+
+def test_delete_task(tmp_path):
+    path = tmp_path / 'data_path'
+            
+    storage = JsonStorage(path)
+    service = PlannerService(storage)
+
+    task = service.add_task("Ознакомиться с Pydantic", 4, tags=['programming'])
+    new_service = PlannerService(storage)
+
+    assert task.id == 1
+    assert task.tags == ['programming']
+    assert new_service.get_stats() == {'all': 1, 'open': 1, 'done': 0}
+    assert service.get_stats() == new_service.get_stats()
+    
+    service.replace_task(task.id, 'Добавиьт запрос с DELETE', 5, True)
+
+    assert new_service.get_stats() == {'all': 1, 'open': 0, 'done': 1}
+    assert service.get_stats() == new_service.get_stats()
+
+    service.patch_task(task_id = task.id, is_done = False)
+
+    assert new_service.get_stats() == {'all': 1, 'open': 1, 'done': 0}
+    assert service.get_stats() == new_service.get_stats()
+
+    service.remove_task(task.id)
+
+    assert new_service.get_stats() == {'all': 0, 'open': 0, 'done': 0}
+    assert service.get_stats() == new_service.get_stats()
+
+    with pytest.raises(TaskNotFoundError):
+        service.find_task(task.id)
+        service.remove_task(task.id)
