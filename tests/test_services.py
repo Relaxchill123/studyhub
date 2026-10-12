@@ -1,4 +1,4 @@
-from app.exceptions import StorageError 
+from app.exceptions import StorageError, TaskNotFoundError
 import pytest
 from app.storage import MemoryStorage, JsonStorage
 from app.services import PlannerService
@@ -83,3 +83,49 @@ def test_uncorrect_json_file(tmp_path):
         service.list_tasks()
 
     assert path.read_text(encoding="utf-8") == '{broken'
+
+def test_replace_task(tmp_path):
+    path = tmp_path / 'data_path'
+    
+    storage = JsonStorage(path)
+    storage.save([
+            Task(2, "Ознакомиться с Pydantic", 4, tags=['programming']),
+        ])
+    
+    service = PlannerService(storage)
+    service.replace_task(2, 'Освоить pytest', 5, False)
+
+    saved = PlannerService(JsonStorage(path)).list_tasks()[0]
+
+    assert (saved.id, saved.title, saved.priority, saved.is_done) == (
+        2,
+        "Освоить pytest",
+        5,
+        False,
+    )
+    assert saved.tags == ["programming"]
+
+def test_patch_task(tmp_path):
+    path = tmp_path / 'data_path'
+        
+    storage = JsonStorage(path)
+    storage.save([
+            Task(2, "Ознакомиться с Pydantic", 4, tags=['progremming']),
+        ])
+    
+    
+    service = PlannerService(storage)
+    service.patch_task(2,is_done=True)
+
+    new_service = PlannerService(storage)
+    assert new_service.list_tasks()[0].is_done == True
+
+    service.patch_task(2,is_done=False)
+    assert new_service.list_tasks()[0].is_done == False
+
+    service.patch_task(2)
+    with pytest.raises(TaskNotFoundError):
+        service.patch_task(8, is_done=True)
+        
+
+    assert service.list_tasks() == new_service.list_tasks()

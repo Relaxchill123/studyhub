@@ -108,3 +108,36 @@ class PlannerService:
             res_tasks = tasks.copy()
 
         return sorted(res_tasks, key=lambda x: x.id,reverse=sort_desc)[:limit]
+
+    def replace_task(self, task_id, title, priority, is_done):
+        task = self.find_task(task_id)
+        replace_task = Task(task.id, title, priority, is_done, task.tags)
+        # "Сначала создай и проверь новую Task" - создание реализовал в строке
+        # 114, не могу разобраться, что нужно проверить? Поля title, priority 
+        # проверяются в models.py в __post_init__
+        tasks = self.list_tasks()
+        index_task_for_replace = tasks.index(task)
+        tasks[index_task_for_replace] = replace_task
+        self.storage.save(tasks)
+        
+        return replace_task
+
+    def patch_task(self, task_id, title=None, priority=None, is_done=None):
+        tasks = self.list_tasks()
+        task = self.find_task(task_id, tasks)
+
+        if title is None and priority is None and is_done is None:
+            return task
+
+        updated_task = Task(
+            task.id,
+            task.title if title is None else title,
+            task.priority if priority is None else priority,
+            task.is_done if is_done is None else is_done,
+            task.tags.copy(),
+        )
+
+        index = tasks.index(task)
+        tasks[index] = updated_task
+        self.storage.save(tasks)
+        return updated_task

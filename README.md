@@ -19,7 +19,7 @@ python -m venv .venv
 
 pip install -r requirements.txt
 
-python -m uvicorn app.main:app --reload (выполняется из cd studyhub)
+python -m uvicorn app.api:app --reload (выполняется из cd studyhub)
 
 python -m pytest -q 
 

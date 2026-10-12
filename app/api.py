@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from app.main import build_service
 from app.exceptions import TaskNotFoundError
-from app.schemas import TaskCreate, TaskRead
+from app.schemas import TaskCreate, TaskRead, TaskUpdate, TaskPatch
 
 app = FastAPI()
 app.state.planner = build_service()
@@ -66,3 +66,40 @@ def post_task(payload: TaskCreate):
         'priority': task.priority,
         'is_done': task.is_done,
     }
+
+@app.put("/tasks/{task_id}", status_code=200, response_model=TaskRead)
+def put_task(task_id: int, payload: TaskUpdate):
+    try:
+        task = app.state.planner.replace_task(task_id, payload.title, payload.priority, payload.is_done)
+        return {
+                'id': task.id,
+                'title': task.title,
+                'priority': task.priority,
+                'is_done': task.is_done,
+            }
+    except TaskNotFoundError as error:
+        raise HTTPException(
+                    status_code=404,
+                    detail='Task not found',
+                ) from error
+    except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+
+
+@app.patch("/tasks/{task_id}", response_model=TaskRead)
+def put_task(task_id: int, payload: TaskPatch):
+    try:
+        task = app.state.planner.patch_task(task_id, payload.title, payload.priority, payload.is_done)
+        return {
+                'id': task.id,
+                'title': task.title,
+                'priority': task.priority,
+                'is_done': task.is_done,
+            }
+    except TaskNotFoundError as error:
+        raise HTTPException(
+                    status_code=404,
+                    detail='Task not found',
+                ) from error
+    except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
