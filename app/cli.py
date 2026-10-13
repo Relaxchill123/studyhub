@@ -82,7 +82,7 @@ def remove(services):
     except TaskNotFoundError:
         return (False, f'Задачи с ID: {task_id} - нет в списке')
     except ValueError:
-        return (False, "\nОжидалось число")
+        return (False, "\nОжидалось число (больше 1)")
 
     return (True, res)
 
