@@ -2,12 +2,11 @@ from app.storage import JsonStorage
 from app.main import build_service
 import pytest
 from app.api import app
-from fastapi import TestClient
+from fastapi.testclient import TestClient
 
 @pytest.fixture
 def test_service(tmp_path):
     storage = JsonStorage(tmp_path / "tasks.json")
-    # return build_service(storage)
     previous_service = app.state.planner
     app.state.planner = build_service(storage)
     try:
