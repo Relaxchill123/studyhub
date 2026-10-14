@@ -103,3 +103,15 @@ def put_task(task_id: int, payload: TaskPatch):
                 ) from error
     except ValueError as error:
             raise HTTPException(status_code=422, detail=str(error)) from error
+
+@app.delete("/tasks/{task_id}", status_code=204)
+def delete_task(task_id: int):
+    try:
+        if task_id < 0:
+            raise HTTPException(status_code=422, detail="ID не может быть меньше 0")
+        app.state.planner.remove_task(task_id)
+    except TaskNotFoundError as error:
+        raise HTTPException(
+                    status_code=404,
+                    detail='Task not found',
+                ) from error
