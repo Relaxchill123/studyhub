@@ -21,7 +21,7 @@ def test_contract_title(test_service, title, expected_status):
 
 @pytest.mark.parametrize(
     ("priority", "expected_status"),
-    [(1, 201), (5, 201), (6, 422), (0, 422)],
+    [(1, 201), (5, 201), (6, 422), (0, 422), ('high', 422)],
 )
 def test_contract_priority(test_service, priority, expected_status):
     response = test_service.post(
@@ -41,7 +41,7 @@ def test_contract_priority(test_service, priority, expected_status):
     ("id", "expected_status"),
     [(1, 404), ('abc', 422)],
 )
-def test_contract_id(test_service, id, expected_status):
+def test_get_contract_id(test_service, id, expected_status):
     response = test_service.get(
         f"/tasks/{id}",
     )
@@ -51,9 +51,10 @@ def test_contract_id(test_service, id, expected_status):
     ("id", "expected_status"),
     [(1, 404), ('abc', 422)],
 )
-def test_contract_id(test_service, id, expected_status):
+def test_put_contract_id(test_service, id, expected_status):
     response = test_service.put(
             f"/tasks/{id}",
+            json = {"title": "first_test_task", "priority": 3, "is_done": False}
         )
     assert response.status_code == expected_status
 
@@ -61,9 +62,10 @@ def test_contract_id(test_service, id, expected_status):
     ("id", "expected_status"),
     [(1, 404), ('abc', 422)],
 )
-def test_contract_id(test_service, id, expected_status):
+def test_patch_contract_id(test_service, id, expected_status):
     response = test_service.patch(
             f"/tasks/{id}",
+            json = {"title": "first_test_task"}
         )
     assert response.status_code == expected_status
 
@@ -71,7 +73,7 @@ def test_contract_id(test_service, id, expected_status):
     ("id", "expected_status"),
     [(1, 404), ('abc', 422)],
 )
-def test_contract_id(test_service, id, expected_status):
+def test_delete_contract_id(test_service, id, expected_status):
     response = test_service.delete(
             f"/tasks/{id}",
         )
@@ -216,20 +218,24 @@ def test_tasks_filters_limits(test_service, limit, expected_status):
     assert response.status_code == expected_status
 
 def test_unchaged_tasks_with_use_filters(test_service):
-    test_service.post("/tasks", json = {"title": "first_test_task", "priority": 4}).json()
-    test_service.post("/tasks", json = {"title": "second_test_task", "priority": 3}).json()
-    test_service.post("/tasks", json = {"title": "third_test_task", "priority": 5}).json()
+    first_task_id = test_service.post("/tasks", json = {"title": "first_test_task", "priority": 4}).json()["id"]
+    second_task_id = test_service.post("/tasks", json = {"title": "second_test_task", "priority": 3}).json()["id"]
+    third_task_id = test_service.post("/tasks", json = {"title": "third_test_task", "priority": 5}).json()["id"]
+
+    test_service.patch(f"/tasks/{first_task_id}", json = {"is_done": True})
+    test_service.patch(f"/tasks/{second_task_id}", json = {"is_done": True})
 
     stats_before = test_service.get("/stats").json()
     tasks_before = test_service.get("/tasks").json()
 
     response = test_service.get(
-        "/tasks",
-        params={"is_done": False, "sort_desc": False, "limit": 1},
+        f"/tasks",
+        params={"is_done": False, "sort_desc": False, "limit": 10},
     )
 
     assert response.status_code == 200
-    assert len(response.json()) == 1  # limit=1
+    actual_ids = [t["id"] for t in response.json()]
+    assert actual_ids == [third_task_id]
 
     stats_after = test_service.get("/stats").json()
     tasks_after = test_service.get("/tasks").json()
