@@ -21,10 +21,10 @@ def test_create_and_read_task(test_service):
 
     assert post_response.status_code == 201
 
-    post_response.json()["id"] == 3
-    post_response.json()["title"] == "Изучить pytest"
-    post_response.json()["priority"] == 3
-    post_response.json()["is_done"] == False
+    # post_response.json()["id"] == 3
+    assert post_response.json()["title"] == "Изучить pytest"
+    assert post_response.json()["priority"] == 3
+    assert post_response.json()["is_done"] == False
 
     responce_task_id = post_response.json()["id"]
 
@@ -33,7 +33,7 @@ def test_create_and_read_task(test_service):
     assert response.status_code == 200
     data = response.json()
     
-    assert data["id"] == 1
+    assert data["id"] == responce_task_id
     assert data["title"] == "Изучить pytest"
     assert data["priority"] == 3
     assert data["is_done"] is False
