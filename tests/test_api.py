@@ -1,6 +1,3 @@
-import pytest
-import json
-
 def test_health(test_service):
     response = test_service.get("/health")
     assert response.status_code == 200
@@ -23,6 +20,11 @@ def test_create_and_read_task(test_service):
         )
 
     assert post_response.status_code == 201
+
+    post_response.json()["id"] == 3
+    post_response.json()["title"] == "Изучить pytest"
+    post_response.json()["priority"] == 3
+    post_response.json()["is_done"] == False
 
     responce_task_id = post_response.json()["id"]
 
@@ -86,6 +88,9 @@ def test_patch_task(test_service):
     data = response.json()
 
     assert data["is_done"] is False
+    assert response.status_code == 200
+    assert data["title"] == "Изучить pytest"
+    assert data["priority"] == 5
 
 def test_delete_task(test_service):
     post_response = test_service.post(
