@@ -230,7 +230,7 @@ def test_unchaged_tasks_with_use_filters(test_service):
 
     response = test_service.get(
         f"/tasks",
-        params={"is_done": False, "sort_desc": False, "limit": 10},
+        params={"is_done": False, "sort_desc": True, "limit": 1},
     )
 
     assert response.status_code == 200
