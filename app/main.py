@@ -6,8 +6,9 @@ from app.storage import JsonStorage, MemoryStorage
 
 DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
 
-def build_service():
-    storage = JsonStorage(DATA_FILE)
+def build_service(storage=None):
+    if storage is None:
+        storage = JsonStorage(DATA_FILE)
     return PlannerService(storage)
 
 def run():

@@ -67,6 +67,8 @@ class PlannerService:
         return self.storage.load()
 
     def remove_task(self, task_id):
+        if task_id <= 0:
+            raise ValueError
         tasks = self.storage.load()
         task = self.find_task(task_id, tasks)
         tasks.remove(task)
