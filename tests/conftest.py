@@ -10,7 +10,7 @@ def test_service(tmp_path):
     previous_service = app.state.planner
     app.state.planner = build_service(storage)
     try:
-        with TestClient(app) as client:
+        with TestClient(app, follow_redirects=False) as client:
             yield client
     finally:
         app.state.planner = previous_service
