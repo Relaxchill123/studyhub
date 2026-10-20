@@ -82,6 +82,71 @@
         }
       },
       "response": []
+    },
+    {
+      "name": "Put task in Planner",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"title\": \"Проверить PUT\",\r\n    \"priority\": 5,\r\n    \"is_done\": true\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/tasks/7",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tasks",
+            "7"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Patch task in Planner",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"priority\": 6\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/tasks/2",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "tasks",
+            "2"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete task in Planner",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": ""
+        }
+      },
+      "response": []
     }
   ],
   "variable": [

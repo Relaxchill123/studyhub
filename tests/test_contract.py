@@ -173,14 +173,15 @@ def test_contract_patch(test_service):
     assert stats_before == stats_after
     assert tasks_before == tasks_after
 
-    responce = test_service.patch(f"/tasks/{task_id}", json={"is_done": True}).json()
-    responce["is_done"] is True
+    responce = test_service.patch(f"/tasks/{task_id}", json={"is_done": True})
+    assert responce.status_code == 200
+    assert responce.json()["is_done"] is True
 
     tasks_after = test_service.get(f"/tasks/{task_id}").json()
-    assert tasks_after["id"] == responce["id"]
-    assert tasks_after["title"] == responce["title"]
-    assert tasks_after["priority"] == responce["priority"]
-    assert tasks_after["is_done"] == responce["is_done"]
+    assert tasks_after["id"] == responce.json()["id"]
+    assert tasks_after["title"] == responce.json()["title"]
+    assert tasks_after["priority"] == responce.json()["priority"]
+    assert tasks_after["is_done"] == responce.json()["is_done"]
 
     responce = test_service.patch(f"/tasks/{task_id}", json={"is_done": False}).json()
     responce["is_done"] is False
