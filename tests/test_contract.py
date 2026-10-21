@@ -183,14 +183,15 @@ def test_contract_patch(test_service):
     assert tasks_after["priority"] == responce.json()["priority"]
     assert tasks_after["is_done"] == responce.json()["is_done"]
 
-    responce = test_service.patch(f"/tasks/{task_id}", json={"is_done": False}).json()
-    responce["is_done"] is False
+    responce = test_service.patch(f"/tasks/{task_id}", json={"is_done": False})
+    assert responce.status_code == 200
+    assert responce.json()["is_done"] is False
 
     tasks_after = test_service.get(f"/tasks/{task_id}").json()
-    assert tasks_after["id"] == responce["id"]
-    assert tasks_after["title"] == responce["title"]
-    assert tasks_after["priority"] == responce["priority"]
-    assert tasks_after["is_done"] == responce["is_done"]
+    assert tasks_after["id"] == responce.json()["id"]
+    assert tasks_after["title"] == responce.json()["title"]
+    assert tasks_after["priority"] == responce.json()["priority"]
+    assert tasks_after["is_done"] == responce.json()["is_done"]
 
 def test_tasks_filters_defaults(test_service):
     test_service.post("/tasks", json = {"title": "first_test_task", "priority": 4}).json()
