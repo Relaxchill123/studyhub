@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException, Query
-from app.schemas import TaskCreate, TaskRead, TaskUpdate, TaskPatch
+from typing import Annotated
+from fastapi import Path, APIRouter, Request, HTTPException, Query
+from app.routers.tasks.schemas import TaskCreate, TaskRead, TaskUpdate, TaskPatch
 from app.exceptions import TaskNotFoundError
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -24,7 +25,7 @@ def tasks(
     return public_tasks
 
 @router.get("/{task_id}", response_model=TaskRead)
-def get_task(request: Request, task_id: int):
+def get_task(request: Request, task_id: Annotated[int, Path(gt=0)]):
     try:
         task = request.app.state.planner.find_task(task_id)
         return {
@@ -54,7 +55,7 @@ def post_task(request: Request, payload: TaskCreate):
     }
 
 @router.put("/{task_id}", status_code=200, response_model=TaskRead)
-def put_task(request: Request, task_id: int, payload: TaskUpdate):
+def put_task(request: Request, task_id: Annotated[int, Path(gt=0)], payload: TaskUpdate):
     try:
         task = request.app.state.planner.replace_task(task_id, payload.title, payload.priority, payload.is_done)
         return {
@@ -72,7 +73,7 @@ def put_task(request: Request, task_id: int, payload: TaskUpdate):
             raise HTTPException(status_code=422, detail=str(error)) from error
 
 @router.patch("/{task_id}", response_model=TaskRead)
-def put_task(request: Request, task_id: int, payload: TaskPatch):
+def put_task(request: Request, task_id: Annotated[int, Path(gt=0)], payload: TaskPatch):
     try:
         task = request.app.state.planner.patch_task(task_id, payload.title, payload.priority, payload.is_done)
         return {
@@ -91,7 +92,7 @@ def put_task(request: Request, task_id: int, payload: TaskPatch):
 
 
 @router.delete("/{task_id}", status_code=204)
-def delete_task(request: Request, task_id: int):
+def delete_task(request: Request, task_id: Annotated[int, Path(gt=0)]):
     try:
         if task_id <= 0:
             raise HTTPException(status_code=422, detail="ID не может быть меньше 0")
