@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.main import build_service
-from routers.tasks import router
+from app.routers.tasks.router import router
 
 app = FastAPI()
 app.state.planner = build_service()
