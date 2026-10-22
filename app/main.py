@@ -3,12 +3,13 @@ from app.services import PlannerService
 from app.exceptions import StorageError
 from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search, add_tags
 from app.storage import JsonStorage, MemoryStorage
+from app.core.config import load_settings
 
-DATA_FILE = Path(__file__).resolve().parent / "data" / "tasks.json"
-
-def build_service(storage=None):
+def build_service(settings=None, storage=None):
+    if settings is None:
+        settings = load_settings()
     if storage is None:
-        storage = JsonStorage(DATA_FILE)
+        storage = JsonStorage(settings.json_path)
     return PlannerService(storage)
 
 def run():
