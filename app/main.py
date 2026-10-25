@@ -5,7 +5,7 @@ from app.cli import show_menu, get_command, add, show, find, remove, done, stats
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
-def build_service(settings=None, storage=None):
+def build_service(storage=None, settings=None):
     if settings is None:
         settings = load_settings()
     if storage is None:
