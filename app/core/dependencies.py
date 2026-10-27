@@ -2,7 +2,7 @@ from app.services import PlannerService
 from fastapi import Request, Depends, Query
 from typing import Annotated
 from dataclasses import dataclass
-from models import Task
+from app.models import Task
 
 def get_planner(request: Request) -> PlannerService:
     return request.app.state.planner

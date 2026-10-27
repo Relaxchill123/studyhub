@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Path, APIRouter, HTTPException, Query, Depends
 from app.routers.tasks.schemas import TaskCreate, TaskRead, TaskUpdate, TaskPatch
 from app.exceptions import TaskNotFoundError
-from app.core.dependencies import PlannerDep
+from app.core.dependencies import PlannerDep, SelectionParams, get_selected_tasks
 from app.services import PlannerService
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -11,14 +11,12 @@ TaskId = Annotated[int, Path(gt=0)]
 
 @router.get("", response_model=list[TaskRead])
 def tasks(
-    planner: PlannerDep,
-    is_done: bool = None,
-    limit: int = Query(default=10, ge=1, le=50),
-    sort_desc: bool = False):
+    selection: Annotated[SelectionParams, Depends(get_selected_tasks)]
+    ):
 
-    public_tasks =[]
+    public_tasks = []
 
-    for task in planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc):
+    for task in selection:
         public_tasks.append({
             'id': task.id,
             'title': task.title,
