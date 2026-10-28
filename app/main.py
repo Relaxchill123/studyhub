@@ -6,11 +6,13 @@ from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
 def build_service(storage=None, settings=None):
+    if storage is None:
+        return PlannerService(storage)
+    
     if settings is None:
         settings = load_settings()
-    if storage is None:
-        storage = JsonStorage(settings.json_path)
-    return PlannerService(storage)
+    
+    return PlannerService(JsonStorage(settings.json_path))
 
 def run():
 

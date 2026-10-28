@@ -8,6 +8,7 @@ from app.services import PlannerService
 settings = load_settings()
 app = FastAPI(title=settings.app_name)
 app.state.planner = build_service(settings=settings)
+app.state.settings = settings
 app.include_router(router)
 
 @app.get("/health")

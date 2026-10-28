@@ -21,7 +21,7 @@ class SelectionParams:
 def get_selection(
         is_done: Annotated[bool | None, Query()] = None,
         sort_desc: Annotated[bool, Query()] = False,
-        limit: Annotated[int, Query(qe=1, le=50)] = 10,
+        limit: Annotated[int, Query(ge=1, le=50)] = 10,
     ) -> SelectionParams:
     return SelectionParams(is_done, sort_desc, limit)
 
