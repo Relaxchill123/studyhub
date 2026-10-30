@@ -16,15 +16,6 @@ def build_service(storage=None, settings=None):
     
     return PlannerService(JsonStorage(settings.json_path))
 
-# рабочий код
-
-# def build_service(storage=None, settings=None):
-#     if settings is None:
-#         settings = load_settings()
-#     if storage is None:
-#         storage = JsonStorage(settings.json_path)
-#     return PlannerService(storage)
-
 def run():
 
     services = build_service()

@@ -6,7 +6,7 @@ import pytest
 )
 
 def test_contract_title(test_service, planner_version, expected_status):
-    response_without_header = test_service.get("preferences")
+    response_without_header = test_service.get("/preferences")
 
     assert response_without_header.status_code == 200
     assert response_without_header.json()['view'] == 'compact'
@@ -24,7 +24,7 @@ def test_contract_title(test_service, planner_version, expected_status):
     assert response_with_correct_header.headers['X-Planner-Version'] == '1'
 
     response = test_service.get(
-        "preferences",
+        "/preferences",
         headers={"X-Client-Version": planner_version},
     )
     
