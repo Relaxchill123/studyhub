@@ -5,14 +5,25 @@ from app.cli import show_menu, get_command, add, show, find, remove, done, stats
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
+# код, с которым программа падает на тестах
+
 def build_service(storage=None, settings=None):
-    if storage is None:
+    if storage is not None:
         return PlannerService(storage)
     
     if settings is None:
         settings = load_settings()
     
     return PlannerService(JsonStorage(settings.json_path))
+
+# рабочий код
+
+# def build_service(storage=None, settings=None):
+#     if settings is None:
+#         settings = load_settings()
+#     if storage is None:
+#         storage = JsonStorage(settings.json_path)
+#     return PlannerService(storage)
 
 def run():
 

@@ -8,14 +8,14 @@ from app.core.dependencies import get_planner
 @pytest.fixture
 def test_service(tmp_path):
     storage = JsonStorage(tmp_path / "tasks.json")
-    planner = build_service(storage=storage)
+    planner = build_service(storage)
 
     old_overrides = app.dependency_overrides.copy()
 
-    app.dependency_overrides[get_planner] = get_test_planner
-
     def get_test_planner():
         return planner
+
+    app.dependency_overrides[get_planner] = get_test_planner
 
     try:
         with TestClient(app, follow_redirects=False) as client:
