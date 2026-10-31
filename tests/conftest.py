@@ -3,14 +3,23 @@ from app.main import build_service
 import pytest
 from app.api import app
 from fastapi.testclient import TestClient
+from app.core.dependencies import get_planner
 
 @pytest.fixture
 def test_service(tmp_path):
     storage = JsonStorage(tmp_path / "tasks.json")
-    previous_service = app.state.planner
-    app.state.planner = build_service(storage)
+    planner = build_service(storage)
+
+    old_overrides = app.dependency_overrides.copy()
+
+    def get_test_planner():
+        return planner
+
+    app.dependency_overrides[get_planner] = get_test_planner
+
     try:
         with TestClient(app, follow_redirects=False) as client:
             yield client
     finally:
-        app.state.planner = previous_service
+        app.dependency_overrides.clear()
+        app.dependency_overrides.update(old_overrides)
