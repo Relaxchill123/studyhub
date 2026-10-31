@@ -1,22 +1,20 @@
 from typing import Annotated
-from fastapi import Path, APIRouter, HTTPException, Query, Depends, Header, Response
+from fastapi import Path, APIRouter, Request, HTTPException, Query
 from app.routers.tasks.schemas import TaskCreate, TaskRead, TaskUpdate, TaskPatch
 from app.exceptions import TaskNotFoundError
-from app.core.dependencies import PlannerDep, SelectionParams, get_selected_tasks
-from app.services import PlannerService
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
-TaskId = Annotated[int, Path(gt=0)]
-
 @router.get("", response_model=list[TaskRead])
 def tasks(
-    selection: Annotated[SelectionParams, Depends(get_selected_tasks)]
-    ):
+    request: Request,
+    is_done: bool = None,
+    limit: int = Query(default=10, ge=1, le=50),
+    sort_desc: bool = False):
 
-    public_tasks = []
+    public_tasks =[]
 
-    for task in selection:
+    for task in request.app.state.planner.select_tasks(is_done=is_done, limit=limit, sort_desc=sort_desc):
         public_tasks.append({
             'id': task.id,
             'title': task.title,
@@ -27,13 +25,9 @@ def tasks(
     return public_tasks
 
 @router.get("/{task_id}", response_model=TaskRead)
-def get_task(
-    task_id: TaskId,
-    planner: PlannerDep,
-    ):
-
+def get_task(request: Request, task_id: Annotated[int, Path(gt=0)]):
     try:
-        task = planner.find_task(task_id)
+        task = request.app.state.planner.find_task(task_id)
         return {
             'id': task.id,
             'title': task.title,
@@ -47,9 +41,9 @@ def get_task(
         ) from error
 
 @router.post("", status_code=201, response_model=TaskRead)
-def post_task(payload: TaskCreate, planner: PlannerDep):
+def post_task(request: Request, payload: TaskCreate):
     try:
-        task = planner.add_task(payload.title, payload.priority)
+        task = request.app.state.planner.add_task(payload.title, payload.priority)
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
 
@@ -61,9 +55,9 @@ def post_task(payload: TaskCreate, planner: PlannerDep):
     }
 
 @router.put("/{task_id}", status_code=200, response_model=TaskRead)
-def put_task(task_id: TaskId, payload: TaskUpdate, planner: PlannerDep):
+def put_task(request: Request, task_id: Annotated[int, Path(gt=0)], payload: TaskUpdate):
     try:
-        task = planner.replace_task(task_id, payload.title, payload.priority, payload.is_done)
+        task = request.app.state.planner.replace_task(task_id, payload.title, payload.priority, payload.is_done)
         return {
                 'id': task.id,
                 'title': task.title,
@@ -79,9 +73,9 @@ def put_task(task_id: TaskId, payload: TaskUpdate, planner: PlannerDep):
             raise HTTPException(status_code=422, detail=str(error)) from error
 
 @router.patch("/{task_id}", response_model=TaskRead)
-def put_task(task_id: TaskId, payload: TaskPatch, planner: PlannerDep):
+def put_task(request: Request, task_id: Annotated[int, Path(gt=0)], payload: TaskPatch):
     try:
-        task = planner.patch_task(task_id, payload.title, payload.priority, payload.is_done)
+        task = request.app.state.planner.patch_task(task_id, payload.title, payload.priority, payload.is_done)
         return {
                 'id': task.id,
                 'title': task.title,
@@ -98,11 +92,11 @@ def put_task(task_id: TaskId, payload: TaskPatch, planner: PlannerDep):
 
 
 @router.delete("/{task_id}", status_code=204)
-def delete_task(task_id: TaskId, planner: PlannerDep):
+def delete_task(request: Request, task_id: Annotated[int, Path(gt=0)]):
     try:
         if task_id <= 0:
             raise HTTPException(status_code=422, detail="ID не может быть меньше 0")
-        planner.remove_task(task_id)
+        request.app.state.planner.remove_task(task_id)
     except TaskNotFoundError as error:
         raise HTTPException(
                     status_code=404,
