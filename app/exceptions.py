@@ -3,3 +3,6 @@ class TaskNotFoundError(Exception):
 
 class StorageError(Exception):
     pass
+
+class CookieSecureError(Exception):
+    pass

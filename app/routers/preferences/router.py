@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import APIRouter, Header, Response, Cookie, status
 from app.routers.preferences.schemas import PreferenceWrite, PreferenceRead
-
+from app.core.dependencies import SettingsDep
 router = APIRouter(prefix="/preferences", tags=["preferences"])
 
 @router.get("", response_model = PreferenceRead)
@@ -26,6 +26,7 @@ def read_preferences(
 def update_preferences(
     response: Response,
     payload: PreferenceWrite,
+    settings: SettingsDep,
     client_version: Annotated[
             str | None,
             Header(alias='X-Client-Version', max_length=64),
@@ -34,14 +35,12 @@ def update_preferences(
     
     response.headers['X-Planner-Version'] = "1"
 
-    # if payload is None
-
     response.set_cookie(
-        key="planer_view",
+        key="planner_view",
         value=payload.view,
         path="/preferences",
         httponly=True,
-        secure=False,
+        secure=settings.cookie_secure, # 
         samesite="lax",
     )
 

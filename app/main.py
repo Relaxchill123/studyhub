@@ -1,11 +1,8 @@
-from pathlib import Path
 from app.services import PlannerService
 from app.exceptions import StorageError
 from app.cli import show_menu, get_command, add, show, find, remove, done, stats, search, add_tags
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
-
-# код, с которым программа падает на тестах
 
 def build_service(storage=None, settings=None):
     if storage is not None:
