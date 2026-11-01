@@ -24,16 +24,17 @@ def load_settings():
 
     COOKIE_SECURE = os.environ.get("COOKIE_SECURE")
 
-    if COOKIE_SECURE:
-        normalize_cookie_secure = COOKIE_SECURE.lower().strip()
-        if normalize_cookie_secure == 'true':
-            COOKIE_SECURE = True
-        elif normalize_cookie_secure == 'false':
-            COOKIE_SECURE = False
-        else:
-            raise CookieSecureError("Значение COOKIE_SECURE задано некорректно")
-    else:
+    if not COOKIE_SECURE:
+        raise CookieSecureError("Значение COOKIE_SECURE задано некорректно")
+    
+    normalize_cookie_secure = COOKIE_SECURE.lower().strip()
+    if normalize_cookie_secure == 'true':
+        COOKIE_SECURE = True
+    elif normalize_cookie_secure == 'false':
         COOKIE_SECURE = False
+    else:
+        raise CookieSecureError("Значение COOKIE_SECURE задано некорректно")
+    
 
 
     return Settings(json_path=JSON_PATH, app_name=APP_NAME, cookie_secure=COOKIE_SECURE)
