@@ -32,7 +32,7 @@ rows = connection.execute(
 connection.commit()
 
 connection.execute(
-    'UPDATE tasks SET priority = ? WHERE id = ?',
+    'UPDATE checkins SET priority = ? WHERE id = ?',
     (99, 1),
 )
 
