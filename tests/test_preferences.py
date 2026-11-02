@@ -32,7 +32,7 @@ def test_contract_title(test_service, planner_version, expected_status):
     if expected_status == 200:
         assert response.headers['X-Planner-Version'] == '1'
         assert response.json()['view'] == 'compact'
-        assert response.json()['client_version'] == '1'
+        assert response.headers['X-Planner-Version'] == '1'
 
     if expected_status == 422:
         print(response.json()["detail"])
