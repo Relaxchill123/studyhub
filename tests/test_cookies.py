@@ -10,6 +10,7 @@ def test_saved_client_cookie(test_service):
     second_responce = test_service.get("/preferences")
 
     assert second_responce.status_code == 200
+    print(second_responce.json())
     assert second_responce.json()['view'] == 'detailed'
 
     bad_responce = test_service.put(
@@ -19,3 +20,8 @@ def test_saved_client_cookie(test_service):
 
     assert bad_responce.status_code == 422
     assert bad_responce.json()["detail"][0]["loc"][1] == 'view'
+
+    responce_after_bad_put = test_service.get("/preferences")
+
+    assert responce_after_bad_put.status_code == 200
+    assert responce_after_bad_put.json()['view'] == 'detailed'
