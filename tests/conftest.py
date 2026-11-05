@@ -3,7 +3,8 @@ from app.main import build_service
 import pytest
 from app.api import app
 from fastapi.testclient import TestClient
-from app.core.dependencies import get_planner
+from app.core.dependencies import get_planner, get_settings, Settings
+from pathlib import Path
 
 @pytest.fixture
 def test_service(tmp_path):
@@ -12,10 +13,15 @@ def test_service(tmp_path):
 
     old_overrides = app.dependency_overrides.copy()
 
-    def get_test_planner():
-        return planner
+    test_settings = Settings(
+        json_path=Path("dummy.json"),
+        app_name="Test",
+        cookie_secure=False,
+        database_url="sqlite:///:memory:"
+    )
 
-    app.dependency_overrides[get_planner] = get_test_planner
+    app.dependency_overrides[get_planner] = lambda: planner
+    app.dependency_overrides[get_settings] = lambda: test_settings
 
     try:
         with TestClient(app, follow_redirects=False) as client:

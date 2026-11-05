@@ -16,14 +16,31 @@ connection.execute(
 
 connection.commit()
 
-# rows = connection.execute(
-#     "SELECT id, title, priority, is_done FROM checkins WHERE id = ? ORDER BY priority DESC, id ASC LIMIT ?",
-#     (0, 2),
-# ).fetchall()
+rows = connection.execute(
+    "SELECT id, title, priority, is_done FROM checkins WHERE id = ? ORDER BY priority DESC, id ASC LIMIT ?",
+    (1, 2),
+).fetchall()
 
 connection.execute(
-    "UPDATE checkins SET priority = 4 WHERE id = 1"
+    "UPDATE checkins SET priority = ? WHERE id = ?", 
+    (4, 1)
 )
+
+connection.execute(
+    "DELETE FROM checkins WHERE id = ?",
+    (2,)
+)
+
+updated = connection.execute(
+    'SELECT id, priority FROM tasks WHERE id = ?', (1,)
+).fetchone()
+
+deleted = connection.execute(
+    'SELECT id FROM tasks WHERE id = ?', (2,)
+).fetchone()
+
+assert updated == (1, 4)
+assert deleted is None
 
 rows = connection.execute(
     "SELECT * FROM checkins"
@@ -39,7 +56,7 @@ connection.execute(
 connection.rollback()
 
 rows = connection.execute(
-    "SELECT * FROM checkins WHERE id = 99"
+    "SELECT priority FROM checkins WHERE id = ?", (4, 1)
 ).fetchall()
 
 print(rows)
