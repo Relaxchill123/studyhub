@@ -58,8 +58,8 @@ def load_settings(environ=None, project_root=None):
 
     COOKIE_SECURE = os.environ.get("COOKIE_SECURE")
 
-    if not COOKIE_SECURE:
-        raise CookieSecureError("Значение COOKIE_SECURE задано некорректно")
+    if COOKIE_SECURE is None:
+        COOKIE_SECURE = False
     
     normalize_cookie_secure = COOKIE_SECURE.lower().strip()
     if normalize_cookie_secure == 'true':
