@@ -2,7 +2,10 @@ import sqlite3
 
 connection = sqlite3.connect(":memory:")
 connection.execute(
-    "CREATE TABLE checkins (id INTEGER PRIMARY KEY, title TEXT, priority INTEGER, is_done BOOLEAN)"
+    """CREATE TABLE checkins 
+    (id INTEGER PRIMARY KEY, 
+    title TEXT, priority INTEGER,
+    is_done BOOLEAN)"""
 )
 connection.execute(
     "INSERT INTO checkins (title, priority, is_done) VALUES (?, ?, ?)",
@@ -17,7 +20,11 @@ connection.execute(
 connection.commit()
 
 rows = connection.execute(
-    "SELECT id, title, priority, is_done FROM checkins WHERE id = ? ORDER BY priority DESC, id ASC LIMIT ?",
+    """SELECT id, title, priority, is_done 
+    FROM checkins 
+    WHERE id = ? 
+    ORDER BY priority DESC, id ASC 
+    LIMIT ?""",
     (1, 2),
 ).fetchall()
 
@@ -32,11 +39,11 @@ connection.execute(
 )
 
 updated = connection.execute(
-    'SELECT id, priority FROM tasks WHERE id = ?', (1,)
+    'SELECT id, priority FROM checkins WHERE id = ?', (1,)
 ).fetchone()
 
 deleted = connection.execute(
-    'SELECT id FROM tasks WHERE id = ?', (2,)
+    'SELECT id FROM checkins WHERE id = ?', (2,)
 ).fetchone()
 
 assert updated == (1, 4)
@@ -56,8 +63,10 @@ connection.execute(
 connection.rollback()
 
 rows = connection.execute(
-    "SELECT priority FROM checkins WHERE id = ?", (4, 1)
-).fetchall()
+    "SELECT priority FROM checkins WHERE id = ?", (1,)
+).fetchone()
+
+assert rows[0] == 4
 
 print(rows)
 connection.close()
