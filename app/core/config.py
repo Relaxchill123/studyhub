@@ -55,7 +55,13 @@ class Settings:
     )
 
 def load_settings(environ=None, project_root=None):
-    JSON_PATH = os.environ.get("JSON_PATH")
+    if environ is None:
+        environ = os.environ
+
+    if project_root is None:
+        project_root = PROJECT_ROOT
+
+    JSON_PATH = environ.get("JSON_PATH")
     
     if JSON_PATH is None:
         JSON_PATH = (
@@ -64,9 +70,9 @@ def load_settings(environ=None, project_root=None):
     else:
         JSON_PATH = Path(JSON_PATH)
     
-    APP_NAME = os.environ.get("APP_NAME", "StudyHub Planner")
+    APP_NAME = environ.get("APP_NAME", "StudyHub Planner")
 
-    COOKIE_SECURE = os.environ.get("COOKIE_SECURE")
+    COOKIE_SECURE = environ.get("COOKIE_SECURE")
 
     if COOKIE_SECURE is None:
         COOKIE_SECURE = False
@@ -81,10 +87,10 @@ def load_settings(environ=None, project_root=None):
                 "Значение COOKIE_SECURE задано некорректно"
             )
 
-        db_url = normalize_database_url(
-            os.environ.get("DATABASE_URL"),
-            PROJECT_ROOT
-        )
+    db_url = normalize_database_url(
+        environ.get("DATABASE_URL"),
+        project_root
+    )
 
     return Settings(
         json_path=JSON_PATH,

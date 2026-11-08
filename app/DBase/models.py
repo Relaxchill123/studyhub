@@ -1,10 +1,10 @@
 from sqlalchemy import Integer, String, Boolean, JSON, CheckConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-class TaskBase(DeclarativeBase):
+class Base(DeclarativeBase):
     pass
 
-class TaskRow(TaskBase):
+class TaskRow(Base):
     __tablename__ = 'tasks'
 
     id: Mapped[int] = mapped_column(
@@ -40,7 +40,7 @@ class TaskRow(TaskBase):
                 name="check_id_positive"
             ),
         CheckConstraint(
-            "priority >= 1 AND priority <= 5",
-            name="check_priority_range"
+                "priority >= 1 AND priority <= 5",
+                name="check_priority_range"
             ),
     )

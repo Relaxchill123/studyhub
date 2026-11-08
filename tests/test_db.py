@@ -3,7 +3,7 @@ from app.DBase.engine import make_engine
 from app.core.config import load_settings
 
 import app.DBase.models
-from app.DBase.models import TaskBase
+from app.DBase.models import Base
 
 
 def test_engine_selects_one_on_temporary_file(tmp_path):
@@ -42,7 +42,7 @@ def test_comparison_table(tmp_path):
     ).render_as_string(hide_password=False)
     engine = make_engine(url)
 
-    TaskBase.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
 
     with engine.connect() as connection:
         columns = connection.execute(text('PRAGMA table_info(tasks)')).all()
@@ -54,6 +54,21 @@ def test_comparison_table(tmp_path):
     assert len(columns) == 6
 
     assert columns[0][5] == 1
-    assert [not_null[3] for not_null in columns] == [1] * len(columns) - 1
+
+    for column in columns:
+        assert column[3] == 1
+
+    assert "check_id_positive" in create_sql
+    assert "check_priority_range" in create_sql
+
+    assert columns[0][1] == 'id'
+    assert columns[1][1] == 'title'
+    assert columns[2][1] == 'priority'
+    assert columns[3][1] == 'is_done'
+    assert columns[4][1] == 'tags'
+    assert columns[5][1] == 'title_normalized'
+
+    Base.metadata.create_all(engine)
+
     print("\n-------------\n", columns)
     print("\n-------------\n", create_sql)
