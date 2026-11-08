@@ -9,10 +9,7 @@ from app.services import PlannerService
 )
 
 def test_contract_title(tmp_path, test_service, planner_version, expected_status):
-    tasks_before_tests = test_service.get("/tasks")
-    stats_before_tests = test_service.get("/stats")
-
-    path = tmp_path / 'data_path'
+    path = tmp_path / "tasks.json"
     storage = JsonStorage(path)
     storage.save([
         Task(2, "Ознакомиться с Pydantic", 4, tags=[]),
@@ -20,6 +17,9 @@ def test_contract_title(tmp_path, test_service, planner_version, expected_status
     ])
 
     service = PlannerService(storage)
+
+    tasks_before_tests = test_service.get("/tasks")
+    stats_before_tests = test_service.get("/stats")
 
     cli_tasks_before = service.list_tasks()
     cli_stats_before = service.get_stats()
