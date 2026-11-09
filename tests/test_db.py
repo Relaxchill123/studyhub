@@ -70,5 +70,85 @@ def test_comparison_table(tmp_path):
 
     Base.metadata.create_all(engine)
 
-    print("\n-------------\n", columns)
-    print("\n-------------\n", create_sql)
+def test_coorect_re_launch(tmp_path):
+    first_database_path = tmp_path / "first_probe.sqlite3"
+    url = URL.create(
+        "sqlite",
+        database=first_database_path.as_posix(),
+    ).render_as_string(hide_password=False)
+    engine = make_engine(url)
+
+    import app.DBase.init_db
+
+    with engine.connect() as connection:
+        result  = connection.execute(
+            text('SELECT sql FROM sqlite_master'),
+        ).first()
+
+    assert result is None
+
+    Base.metadata.create_all(engine)
+
+    with engine.connect() as connection:
+        connection.execute(
+            text("""INSERT INTO tasks (title, priority, is_done, tags, title_normalized) 
+                    VALUES (:title, :priority, :is_done, :tags, :title_normalized)"""),
+            {
+                "title": "Создать тестовое соединение", 
+                "priority": 2, 
+                "is_done": False,
+                "tags": "[]",
+                "title_normalized": "создать тестовое соединение"
+            }
+        )
+        connection.commit()
+
+    Base.metadata.create_all(engine)
+
+    with engine.connect() as connection:
+            columns = connection.execute(text('PRAGMA table_info(tasks)')).all()
+            result  = connection.execute(
+                text('SELECT sql FROM sqlite_master'),
+            ).all()
+
+    assert columns[0][1] == 'id'
+    assert columns[1][1] == 'title'
+    assert columns[2][1] == 'priority'
+    assert columns[3][1] == 'is_done'
+    assert columns[4][1] == 'tags'
+    assert columns[5][1] == 'title_normalized'
+
+    assert len(result) == 1
+
+    second_database_path = tmp_path / "second_probe.sqlite3"
+    url = URL.create(
+        "sqlite",
+        database=second_database_path.as_posix(),
+    ).render_as_string(hide_password=False)
+    engine = make_engine(url)
+
+    with engine.connect() as connection:
+        connection.execute(text(
+            "CREATE TABLE tasks (id INTEGER PRIMARY KEY, marker TEXT)"
+        ))
+        connection.execute(
+            text("""INSERT INTO tasks (marker) 
+                    VALUES (:marker)"""),
+            {
+                "marker": "test", 
+            }
+        )
+    connection.commit()
+
+    Base.metadata.create_all(engine)
+
+    with engine.connect() as connection:
+        columns = connection.execute(text('PRAGMA table_info(tasks)')).all()
+        result  = connection.execute(
+            text('SELECT sql FROM sqlite_master'),
+        ).all()
+
+    assert columns[0][1] == 'id'
+    assert columns[1][1] == 'marker'
+
+    assert len(result) == 1
