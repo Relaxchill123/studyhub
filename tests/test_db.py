@@ -106,10 +106,17 @@ def test_coorect_re_launch(tmp_path):
     Base.metadata.create_all(engine)
 
     with engine.connect() as connection:
-            columns = connection.execute(text('PRAGMA table_info(tasks)')).all()
-            result  = connection.execute(
-                text('SELECT sql FROM sqlite_master'),
-            ).all()
+        task = connection.execute(
+            text("SELECT * FROM tasks ")
+        ).first()
+
+    assert task[1] == "Создать тестовое соединение"
+
+    with engine.connect() as connection:
+        columns = connection.execute(text('PRAGMA table_info(tasks)')).all()
+        result  = connection.execute(
+            text('SELECT sql FROM sqlite_master'),
+        ).all()
 
     assert columns[0][1] == 'id'
     assert columns[1][1] == 'title'
@@ -138,7 +145,7 @@ def test_coorect_re_launch(tmp_path):
                 "marker": "test", 
             }
         )
-    connection.commit()
+        connection.commit()
 
     Base.metadata.create_all(engine)
 
@@ -147,6 +154,12 @@ def test_coorect_re_launch(tmp_path):
         result  = connection.execute(
             text('SELECT sql FROM sqlite_master'),
         ).all()
+        task = connection.execute(
+            text("SELECT * FROM tasks ")
+        ).first()
+
+    assert task[1] == 'test'
+    assert len(task) == 2
 
     assert columns[0][1] == 'id'
     assert columns[1][1] == 'marker'
