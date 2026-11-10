@@ -1,11 +1,29 @@
 import pytest
+from app.storage import JsonStorage
+from app.models import Task
+from app.services import PlannerService
 
 @pytest.mark.parametrize(
     ("planner_version", "expected_status"),
     [("1", 200), ("A" * 65, 422)],
 )
 
-def test_contract_title(test_service, planner_version, expected_status):
+def test_contract_title(tmp_path, test_service, planner_version, expected_status):
+    path = tmp_path / "tasks.json"
+    storage = JsonStorage(path)
+    storage.save([
+        Task(2, "Ознакомиться с Pydantic", 4, tags=[]),
+        Task(7, "Ознакомиться с FastAPI", 4, tags=[]),
+    ])
+
+    service = PlannerService(storage)
+
+    tasks_before_tests = test_service.get("/tasks")
+    stats_before_tests = test_service.get("/stats")
+
+    cli_tasks_before = service.list_tasks()
+    cli_stats_before = service.get_stats()
+    
     response_without_header = test_service.get("/preferences")
 
     assert response_without_header.status_code == 200
@@ -37,3 +55,14 @@ def test_contract_title(test_service, planner_version, expected_status):
     if expected_status == 422:
         print(response.json()["detail"])
         assert response.json()["detail"][0]["loc"][0] == 'header'
+
+    tasks_after_tests = test_service.get("/tasks")
+    stats_after_tests = test_service.get("/stats")
+
+    cli_tasks_after = service.list_tasks()
+    cli_stats_after = service.get_stats()
+
+    assert cli_tasks_after == cli_tasks_before
+    assert cli_stats_after == cli_stats_before
+    assert tasks_before_tests.json() == tasks_after_tests.json()
+    assert stats_before_tests.json() == stats_after_tests.json()
