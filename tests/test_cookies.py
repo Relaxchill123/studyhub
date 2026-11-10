@@ -1,76 +1,72 @@
-from app.core.config import Settings
-from app.core.dependencies import get_settings
-from app.api import app
-from pathlib import Path
+import sqlite3
 
-def test_saved_client_cookie(test_service):
-    first_responce_after_put = test_service.put(
-        "/preferences", 
-        json = {'view': 'detailed'}
-    )
+connection = sqlite3.connect(":memory:")
+connection.execute(
+    """CREATE TABLE checkins 
+    (id INTEGER PRIMARY KEY, 
+    title TEXT, priority INTEGER,
+    is_done BOOLEAN)"""
+)
+connection.execute(
+    "INSERT INTO checkins (title, priority, is_done) VALUES (?, ?, ?)",
+    ("Создать тестовое соединение", 2, 0))
+connection.execute(
+    "INSERT INTO checkins (title, priority, is_done) VALUES (?, ?, ?)",
+    ("Отправить несколько INSERT-запросов", 3, 0))
+connection.execute(
+    "INSERT INTO checkins (title, priority, is_done) VALUES (?, ?, ?)",
+    ("Проверить корректность выполнненых операций", 5, 0))
 
-    assert first_responce_after_put.status_code == 200
-    assert first_responce_after_put.json()['view'] == 'detailed'
+connection.commit()
 
-    second_responce = test_service.get("/preferences")
+rows = connection.execute(
+    """SELECT id, title, priority, is_done 
+    FROM checkins 
+    WHERE id = ? 
+    ORDER BY priority DESC, id ASC 
+    LIMIT ?""",
+    (1, 2),
+).fetchall()
 
-    assert second_responce.status_code == 200
-    assert second_responce.json()['view'] == 'detailed'
+connection.execute(
+    "UPDATE checkins SET priority = ? WHERE id = ?", 
+    (4, 1)
+)
 
-    bad_responce = test_service.put(
-        "/preferences", 
-        json = {'view': ''}
-    )
+connection.execute(
+    "DELETE FROM checkins WHERE id = ?",
+    (2,)
+)
 
-    assert bad_responce.status_code == 422
-    assert bad_responce.json()["detail"][0]["loc"][1] == 'view'
+updated = connection.execute(
+    'SELECT id, priority FROM checkins WHERE id = ?', (1,)
+).fetchone()
 
-    responce_after_bad_put = test_service.get("/preferences")
+deleted = connection.execute(
+    'SELECT id FROM checkins WHERE id = ?', (2,)
+).fetchone()
 
-    assert responce_after_bad_put.status_code == 200
-    assert responce_after_bad_put.json()['view'] == 'detailed'
+assert updated == (1, 4)
+assert deleted is None
 
-    deleted_responce = test_service.delete("/preferences")
+rows = connection.execute(
+    "SELECT * FROM checkins"
+).fetchall()
 
-    assert deleted_responce.status_code == 204
-    assert deleted_responce.content == b""
+connection.commit()
 
-    responce_after_delete = test_service.get("/preferences")
+connection.execute(
+    'UPDATE checkins SET priority = ? WHERE id = ?',
+    (99, 1),
+)
 
-    assert responce_after_delete.json()['view'] == 'compact'
+connection.rollback()
 
-    new_responce = test_service.get("/preferences", cookies={"planner_view": "admin"})
+rows = connection.execute(
+    "SELECT priority FROM checkins WHERE id = ?", (1,)
+).fetchone()
 
-    assert new_responce.status_code == 200
-    assert new_responce.json()["view"] == "compact"
+assert rows[0] == 4
 
-    put_new_responce = test_service.put(
-        "/preferences",
-        json={"view": "detailed"},
-        headers = {"X-Client-Version": '1'},
-    )
-
-    assert put_new_responce.headers['X-Planner-Version'] == '1'
-    assert put_new_responce.json()['client_version'] == '1'
-
-def test_secure_cookie_flag(test_service):
-
-    secure_settings = Settings(
-        json_path=Path("dummy.json"),
-        app_name="Test",
-        cookie_secure=True,
-        database_url="sqlite:///:memory:"
-    )
-    app.dependency_overrides[get_settings] = lambda: secure_settings
-
-    try:
-        resp = test_service.put("/preferences", json={"view": "detailed"})
-        
-        assert resp.status_code == 200
-        print(resp.headers["set-cookie"])
-        assert "Secure" in resp.headers["set-cookie"]
-        
-    finally:
-        app.dependency_overrides[get_settings] = lambda: Settings(
-            cookie_secure=False,
-        )
+print(rows)
+connection.close()

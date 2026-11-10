@@ -53,7 +53,7 @@ def update_preferences(
     response.headers['X-Planner-Version'] = "1"
 
     response.delete_cookie(
-        key="planner_view",
+        key="planer_view",
         path="/preferences",
     )
 
