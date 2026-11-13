@@ -21,7 +21,7 @@ def test_correct_transactions(isolated_database):
     engine, session_factory = isolated_database
 
     task = TaskRow(
-        title="Выполнить рактику 68.1",
+        title="Выполнить практику 68.1",
         priority=4,
         is_done=False,
         tags=['taskToToday'],
@@ -40,7 +40,7 @@ def test_correct_transactions(isolated_database):
 
 def test_correnct_and_uncorrect_task_in_transaction(isolated_database):
     task = TaskRow(
-            title="Выполнить рактику 68.1",
+            title="Выполнить практику 68.1",
             priority=4,
             is_done=False,
             tags=['taskToToday'],
@@ -74,7 +74,7 @@ def test_correnct_and_uncorrect_task_in_transaction(isolated_database):
 
 def test_request_after_uncorrect_task(isolated_database):
     task = TaskRow(
-            title="Выполнить рактику 68.1",
+            title="Выполнить практику 68.1",
             priority=4,
             is_done=False,
             tags=['taskToToday'],
@@ -115,7 +115,7 @@ def test_request_after_uncorrect_task(isolated_database):
         
         assert saved_task is not None
         assert saved_task.id == task_id
-        assert saved_task.title == "Выполнить рактику 68.1"
+        assert saved_task.title == "Выполнить практику 68.1"
         assert saved_task.priority == 4
         assert saved_task.is_done is False
         assert saved_task.tags == ['taskToToday']
@@ -125,7 +125,7 @@ def test_clear_resourse(isolated_database):
     engine, session_factory = isolated_database
 
     task = TaskRow(
-                title="Выполнить рактику 68.1",
+                title="Выполнить практику 68.1",
                 priority=4,
                 is_done=False,
                 tags=['taskToToday'],
@@ -143,7 +143,7 @@ def test_clear_resourse(isolated_database):
     with session_factory() as session:
         session.add(task)
         session.flush()
-        
+
         session.add(uncorrect_task)
 
         with pytest.raises(IntegrityError):
