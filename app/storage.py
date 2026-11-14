@@ -55,3 +55,72 @@ class JsonStorage:
             return True # Обработка
         except OSError as error:
             raise StorageError("Не удалось сохранить задачи") from error
+
+
+class JsonTaskRepository():
+    def __init__(self, storage):
+        self.storage = storage
+
+    def list(self):
+        return self.storage.load()
+
+    def get(self, id: int) -> Task | None:
+        tasks = self.storage.load()
+
+        for task in tasks:
+            if id == task.id:
+                return task
+        return None
+
+    def select(self,
+            is_done: bool | None = None,
+            sort_desc=False,
+            limit=10,
+        ):
+
+        tasks = self.storage.load()
+        res_tasks = []
+
+        if is_done is not None:
+            res_tasks = list(
+                filter(
+                    lambda task: task.is_done == is_done, tasks
+                    )
+                )
+        else:
+            res_tasks = tasks.copy()
+
+        return sorted(
+            res_tasks,
+            key=lambda x: x.id,reverse=sort_desc
+        )[:limit]           
+
+    def search(self, title: str):
+        clean_title = title.strip().lower()
+
+        if not clean_title:      
+            return []
+
+        tasks = self.storage.load()
+        result = []        
+        
+        for task in tasks:
+            if clean_title in task.title.lower():
+                result.append(task)
+
+        return result
+
+    def statics(self):
+        tasks = self.storage.load()
+        done = 0
+
+        for task in tasks:
+            if task.is_done:
+                done += 1
+
+        return {
+            'all': len(tasks),
+            'open': len(tasks) - done,
+            'done': done
+        }
+
