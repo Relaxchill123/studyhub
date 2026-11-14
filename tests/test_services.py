@@ -162,7 +162,7 @@ def test_delete_task(tmp_path):
     assert service.list_tasks()[0].tags == ['programming', 'leetcode']
 
     with pytest.raises(TaskNotFoundError):
-        service.find_task(task.id)
+        service.get_task(task.id)
 
     with pytest.raises(TaskNotFoundError):
         service.remove_task(task.id)
