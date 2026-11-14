@@ -140,13 +140,12 @@ def test_clear_resourse(isolated_database):
         title_normalized="выполнить попытку внесения задачи с некорректным priority"
     )
 
-    with session_factory() as session:
-        session.add(task)
-        session.flush()
+    with pytest.raises(IntegrityError):
+        with session_factory() as session:
+            session.add(task)
+            session.flush()
 
-        session.add(uncorrect_task)
-
-        with pytest.raises(IntegrityError):
+            session.add(uncorrect_task)
             session.flush()
 
         

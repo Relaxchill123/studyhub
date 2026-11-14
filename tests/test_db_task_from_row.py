@@ -52,18 +52,23 @@ def test_task_from_row(isolated_database):
 
         returned_list = [task_from_row(task) for task in task_rows]
 
-        assert isinstance(task_from_row(session.get(TaskRow, 1)), Task)
-        assert session.get(TaskRow, 3) is None
+    returned_task = returned_list[0]
 
+    planner_task = task_from_row(session.get(TaskRow, 1))
+
+    assert isinstance(planner_task, Task)
+    assert returned_task.id == planner_task.id
+    assert returned_task.title == planner_task.title
+    assert returned_task.priority == planner_task.priority
+    assert returned_task.is_done == planner_task.is_done
+    assert returned_task.tags == planner_task.tags
+    assert session.get(TaskRow, 3) is None
 
     assert len(returned_list) == 2
 
-    print("_____________!!!!!!!!______")
-    print(returned_list)
+    returned_list[0].tags.append('new_tag')
 
-    returned_list[0].tags = ['one', 'new_tag']
-
-    assert returned_list[0].tags == ['one', 'new_tag']
+    assert returned_list[0].tags == ['new_tag']
     assert returned_list[1].tags == ['taskToToday']
 
     with pytest.raises(AttributeError):
