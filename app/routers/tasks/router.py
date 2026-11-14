@@ -33,7 +33,7 @@ def get_task(
     ):
 
     try:
-        task = planner.find_task(task_id)
+        task = planner.get_task(task_id)
         return {
             'id': task.id,
             'title': task.title,
