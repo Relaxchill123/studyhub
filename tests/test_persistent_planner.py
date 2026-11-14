@@ -127,7 +127,7 @@ def test_cli_commands(tmp_path, monkeypatch, capsys):
 
     result = remove(service)
 
-    assert result[1] == f"Задача: {tasks[0]} - удалена"
+    assert result[1] == f"Задача c id {tasks[0].id} - удалена"
 
     answers = iter(['999'])
     monkeypatch.setattr("builtins.input", lambda _:next(answers))
