@@ -62,7 +62,9 @@ class PlannerService:
         old_task = self.jsonrepository.get(task_id)
         if old_task is None:
             raise TaskNotFoundError()
-        return self.jsonrepository.delete(old_task.id)
+        self.jsonrepository.delete(old_task.id)
+
+        return f"Задача: {old_task} - удалена"
 
     def add_tags(self, task_id, tags):
         old_task = self.jsonrepository.get(task_id)

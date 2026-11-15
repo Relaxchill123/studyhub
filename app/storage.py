@@ -172,7 +172,8 @@ class JsonTaskRepository():
             if t.id == task_id:
                 del tasks[i]
                 self.storage.save(tasks)
-                return f"Задача c id {task_id} - удалена"
+                return True
+        return False
 
     def mark_done(self, task_id):
         tasks = self.storage.load()
