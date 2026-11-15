@@ -105,7 +105,7 @@ def test_replace_task(tmp_path):
     )
     assert saved.tags == ["programming"]
 
-def test_patch_task(tmp_path):
+def test_patch_task(tmp_path, monkeypatch):
     path = tmp_path / 'data_path'
         
     storage = JsonStorage(path)
@@ -113,10 +113,27 @@ def test_patch_task(tmp_path):
             Task(2, "Ознакомиться с Pydantic", 4, tags=['programming']),
         ])
     
-    
     service = PlannerService(storage)
+    save_count = 0
     service.patch_task(2,is_done=True)
+    original_save = storage.save
 
+    def mock_save(tasks):
+        nonlocal save_count
+        save_count += 1
+        return original_save(tasks)
+
+    monkeypatch.setattr(storage, 'save', mock_save)
+    service.patch_task(2)
+    assert save_count == 0
+    service.patch_task(2, is_done=True)
+    assert save_count == 1
+    service.mark_done_tasks(2)
+    assert save_count == 1
+    with pytest.raises(TaskNotFoundError):
+        service.patch_task(8, is_done=True)
+    assert save_count == 1
+    
     new_service = PlannerService(storage)
     assert new_service.list_tasks()[0].is_done == True
 
@@ -126,7 +143,6 @@ def test_patch_task(tmp_path):
     service.patch_task(2)
     with pytest.raises(TaskNotFoundError):
         service.patch_task(8, is_done=True)
-        
 
     assert service.list_tasks() == new_service.list_tasks()
 
