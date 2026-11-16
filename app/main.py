@@ -4,13 +4,16 @@ from app.cli import show_menu, get_command, add, show, find, remove, done, stats
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
-def build_service(storage=None, settings=None):
+def build_service(storage=None, settings=None, repository=None):
+    if repository is not None:
+        return PlannerService(repository=repository)
+
     if storage is not None:
         return PlannerService(storage)
-    
+
     if settings is None:
         settings = load_settings()
-    
+
     return PlannerService(JsonStorage(settings.json_path))
 
 def run():
