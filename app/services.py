@@ -3,9 +3,13 @@ from app.models import Task
 from app.storage import JsonTaskRepository
 
 class PlannerService:
-    def __init__(self, storage):
+    def __init__(self, storage=None, repository=None):
         self.storage = storage
-        self.jsonrepository = JsonTaskRepository(storage)
+
+        if repository is None:
+            repository = JsonTaskRepository(storage)
+
+        self.jsonrepository = repository
 
     def add_task(self, title, priority, tags=None):
         tags = list(tags or [])

@@ -7,6 +7,7 @@ from app.models import Task
 from app.DBase.models import Base, TaskRow, task_from_row
 from app.DBase.session import create_session_factory
 from app.DBase.repositories import SqlTaskRepository
+from app.main import build_service
 
 @pytest.fixture
 def isolated_database(tmp_path):
@@ -21,8 +22,6 @@ def isolated_database(tmp_path):
 
 def test_correct_tasks_getted_repo(isolated_database):
     engine, session_factory = isolated_database
-
-    sqlrepo = SqlTaskRepository()
 
     first_task = TaskRow(
         title="Выполнить практику 68.1",
@@ -49,7 +48,8 @@ def test_correct_tasks_getted_repo(isolated_database):
                 )
 
     with session_factory() as session:
-        clear_rows =  sqlrepo.list(session)
+        sqlrepo = SqlTaskRepository(session)
+        clear_rows =  sqlrepo.list()
 
         session.add(second_task)
         session.add(first_task)        
@@ -57,10 +57,10 @@ def test_correct_tasks_getted_repo(isolated_database):
         session.flush()
         session.commit()
 
-        getted_task = sqlrepo.get(session, first_task.id)
-        uncorrect_id = sqlrepo.get(session, 4)
+        getted_task = sqlrepo.get(first_task.id)
+        uncorrect_id = sqlrepo.get(4)
 
-        task_rows = sqlrepo.list(session)
+        task_rows = sqlrepo.list()
 
     assert clear_rows == []
     assert uncorrect_id == None
@@ -86,11 +86,12 @@ def test_correct_tasks_getted_repo(isolated_database):
     task_rows[2].is_done = False
 
     with session_factory() as session:
-        getted_task = sqlrepo.get(session, first_task.id)
-        second_getted_task = sqlrepo.get(session, third_task.id)
-        uncorrect_id = sqlrepo.get(session, 4)
+        sqlrepo = SqlTaskRepository(session)
+        getted_task = sqlrepo.get(first_task.id)
+        second_getted_task = sqlrepo.get(third_task.id)
+        uncorrect_id = sqlrepo.get(4)
 
-        task_rows = sqlrepo.list(session)
+        task_rows = sqlrepo.list()
 
         assert getted_task.tags == ['taskToToday']
         assert getted_task.is_done == False
@@ -111,5 +112,9 @@ def test_correct_tasks_getted_repo(isolated_database):
         assert task_rows[1].priority == first_task.priority
         assert task_rows[1].is_done == first_task.is_done
         assert task_rows[1].tags == first_task.tags
+
+        planner = build_service(repository=sqlrepo)
+        assert planner.get_task(first_task.id).id == first_task.id
+        assert len(planner.list_tasks()) == 3
 
         
