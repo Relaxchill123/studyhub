@@ -43,7 +43,7 @@ def test_correct_tasks_getted_repo(isolated_database):
     third_task = TaskRow(
                     title="Выполнить практику 70",
                     priority=2,
-                    is_done=False,
+                    is_done=True,
                     tags=[],
                     title_normalized='выполнить практику 70'
                 )
@@ -81,9 +81,20 @@ def test_correct_tasks_getted_repo(isolated_database):
     assert task_rows[1].is_done == first_task.is_done
     assert task_rows[1].tags == first_task.tags
 
+    task_rows[1].tags.append('new_tag_after_session')
+    task_rows[1].is_done = True
+    task_rows[2].is_done = False
+
     with session_factory() as session:
         getted_task = sqlrepo.get(session, first_task.id)
+        second_getted_task = sqlrepo.get(session, third_task.id)
         uncorrect_id = sqlrepo.get(session, 4)
+
+        task_rows = sqlrepo.list(session)
+
+        assert getted_task.tags == ['taskToToday']
+        assert getted_task.is_done == False
+        assert second_getted_task.is_done == True
 
         assert isinstance(getted_task, Task)
         assert getted_task.id == first_task.id
