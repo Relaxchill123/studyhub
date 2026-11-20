@@ -4,6 +4,17 @@ from app.cli import show_menu, get_command, add, show, find, remove, done, stats
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
+from contextlib import contextmanager
+from app.DBase.repositories import SqlTaskRepository
+
+@contextmanager
+def sql_service_context(session):
+    try:
+        yield build_service(repository=SqlTaskRepository(session))
+    finally:
+        session.close()
+
+
 def build_service(storage=None, settings=None, repository=None):
     if repository is not None:
         return PlannerService(repository=repository)
