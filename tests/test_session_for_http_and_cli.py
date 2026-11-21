@@ -150,19 +150,34 @@ def test_session_closes_on_success_and_error(sql_database):
 
 
 def test_cli_context_closes_session(sql_database):
-    engine, _ = sql_database
+    engine, session_factory  = sql_database
+
+    with session_factory() as session:
+        session.add(TaskRow(id=1, title="CLI Task", priority=2, is_done=False, tags=[], title_normalized="cli task"))
+        session.commit()
     
     TrackingFactory = sessionmaker(bind=engine, class_=TrackingSession)
+    created_sessions = []
     
-    session1 = TrackingFactory()
-    with sql_service_context(session1) as planner:
-        assert session1.was_closed is False 
-        
-    assert session1.was_closed is True 
+    def factory_wrapper():
+        session = TrackingFactory()
+        created_sessions.append(session)
+        return session
+    
+    with sql_service_context(factory_wrapper) as planner:
+        task = planner.get_task(1)
+        assert task.title == "CLI Task"
 
-    session2 = TrackingFactory()
+        assert len(created_sessions) == 1
+        assert created_sessions[0].was_closed is False
+        
+    assert created_sessions[0].was_closed is True 
+
     with pytest.raises(ValueError, match="Ошибка в CLI"):
-        with sql_service_context(session2):
+        with sql_service_context(factory_wrapper) as planner:
+            # Тоже читаем данные до выброса ошибки
+            planner.get_task(1)
             raise ValueError("Ошибка в CLI")
             
-    assert session2.was_closed is True
+    assert len(created_sessions) == 2
+    assert created_sessions[1].was_closed is True
