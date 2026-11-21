@@ -49,7 +49,7 @@ def find(services):
         return (False, '\nID не введен\n')
 
     try:
-        task = services.find_task(int(task_id))
+        task = services.get_task(int(task_id))
     except TaskNotFoundError:
         return (False, "\nПереданной задачи нет в списке\n")
     except ValueError:

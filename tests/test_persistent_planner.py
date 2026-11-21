@@ -31,7 +31,7 @@ def test_is_correct_user_path_in_persistent_planner(tmp_path, monkeypatch):
     before = service.list_tasks()
     
     with pytest.raises(TaskNotFoundError):
-        service.find_task(999)
+        service.get_task(999)
 
     # assert service.list_tasks() == new_service.list_tasks()
 

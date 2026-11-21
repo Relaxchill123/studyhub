@@ -56,7 +56,7 @@ def test_immutability_of_the_storage_after_reading_and_sorting(tmp_path):
 
     assert len(tasks) == 4
 
-    task = service.find_task(2)
+    task = service.get_task(2)
 
     assert task.id == 2
     assert task.title == 'Задача с id 2'
@@ -95,8 +95,8 @@ def test_correct_changes_replace_and_patch(tmp_path):
 
     new_service = build_service(JsonStorage(path))
 
-    new_service_patched_task = new_service.find_task(2)
-    new_service_replaced_task = new_service.find_task(3)
+    new_service_patched_task = new_service.get_task(2)
+    new_service_replaced_task = new_service.get_task(3)
 
     assert len(new_service.list_tasks()) == 2
 
