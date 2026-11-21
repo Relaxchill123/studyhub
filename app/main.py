@@ -8,7 +8,8 @@ from contextlib import contextmanager
 from app.DBase.repositories import SqlTaskRepository
 
 @contextmanager
-def sql_service_context(session):
+def sql_service_context(session_factory):
+    session = session_factory()
     try:
         yield build_service(repository=SqlTaskRepository(session))
     finally:
