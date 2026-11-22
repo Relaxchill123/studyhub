@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+from sqlalchemy import select
 
 from app.exceptions import StorageError
 from app.core.config import load_settings
@@ -11,11 +12,25 @@ from app.main import sql_service_context
 
 
 def validate(task):
-    if task.id <= 0:
-        raise ValueError(f"ID {task.id} должен быть положительным и больше 0")
+    if not isinstance(task['id'], int) and task['id'] <= 0:
+        raise ValueError(
+            f"ID {task['id']} должен быть числом положительным и больше 0"
+        )
 
-    if task.title != task.title.strip():
-        raise ValueError(f"У задачи c ID {task.id} - некоректное название")
+    if task['title'] != task['title'].strip() and not isinstance(task['title'], str):
+        raise ValueError(
+            f"У задачи c ID {task['title']} - некоректное название"
+        )
+
+    if not isinstance(task['is_done'], bool):
+        raise ValueError(
+            f"У задачи c ID {task['is_done']} - некоректное значение"
+        )
+
+    if task.get('tags') and not isinstance(task['tags'], list):
+        raise ValueError(
+            f"У задачи c ID {task['tags']} - поле tags не список"
+        )
 
     return True
 
@@ -32,24 +47,30 @@ def load_json_file(source: Path):
     except PermissionError:
         raise StorageError("К файлу по заданному пути нет доступа")
 
-    if not isinstance(tasks, list):
-        raise StorageError("Корень JSON должен быть списком")
-
-    try:
-        tasks = [Task.task_from_dict(task) for task in tasks]
-    except KeyError as e:
-        raise KeyError(f"Пропущено обязательное поле: {e}")
+    if not tasks or not isinstance(tasks, list):
+        raise StorageError("Корень JSON должен быть непустым списком")
 
     valid_tasks = []
 
     ids = []
+    items = {'id', 'title', 'priority', 'is_done','tags'}
+
     for task in tasks:
-      if validate(task):
-        ids.append(task.id)
-        valid_tasks.append(task)
+        if set(task) - items:
+            raise ValueError("В файле найдены недопустимые поля")            
+        if validate(task):
+            ids.append(task['id'])
+            valid_tasks.append(task)
 
     if len(set(ids)) != len(ids):
         raise ValueError("ID не должны повторяться")
+
+
+    try:
+        valid_tasks = [Task.task_from_dict(task) for task in tasks]
+    except KeyError as e:
+        raise KeyError(f"Пропущено обязательное поле: {e}")
+
 
     return [TaskRow(
             id=task.id,
@@ -62,13 +83,13 @@ def load_json_file(source: Path):
 
 def put_to_sqlite(source: list[TaskRow], target):
     engine = create_engine(target)
-    Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine) # необходима, чтобы перенос выполнялся при вызове 
+    # только этого файла
     session_factory = create_session_factory(engine)
 
-    with sql_service_context(session_factory) as planner:
-        tasks = planner.list_tasks()
-
     with session_factory() as session:
+
+        tasks = session.scalars(select(TaskRow.id).limit(1)).first()
 
         if tasks:
             raise ValueError("target должен быть пуст")
@@ -86,8 +107,9 @@ def put_to_sqlite(source: list[TaskRow], target):
 
     return tasks
 
-settings = load_settings()
-print(put_to_sqlite(
-    source=load_json_file(source=settings.json_path),
-    target=settings.database_url) 
-) 
+if __name__ == '__main__':
+    settings = load_settings()
+    put_to_sqlite(
+        source=load_json_file(source=settings.json_path),
+        target=settings.database_url
+    )
