@@ -41,7 +41,7 @@ class Task:
             title=task['title'],
             priority=task['priority'],
             is_done=task['is_done'],
-            tags=list(task['tags'])
+            tags=list(task['tags']) if task.get('tags') else []
         )
 
     def is_high_priority(self):
