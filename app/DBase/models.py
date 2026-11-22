@@ -1,6 +1,8 @@
 from sqlalchemy import Integer, String, Boolean, JSON, CheckConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
+from app.models import Task
+
 class Base(DeclarativeBase):
     pass
 
@@ -43,4 +45,13 @@ class TaskRow(Base):
                 "priority >= 1 AND priority <= 5",
                 name="check_priority_range"
             ),
+    )
+
+def task_from_row(task_row: TaskRow) -> Task:
+    return Task(
+        id=task_row.id,
+        title=task_row.title,
+        priority=task_row.priority,
+        is_done=task_row.is_done,
+        tags=list(task_row.tags),
     )

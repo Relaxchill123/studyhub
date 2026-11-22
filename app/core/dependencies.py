@@ -4,12 +4,27 @@ from typing import Annotated
 from dataclasses import dataclass
 from app.models import Task
 from app.core.config import Settings
+from collections.abc import Iterator
+
+from fastapi import Request
+from sqlalchemy.orm import Session
 
 def get_planner(request: Request) -> PlannerService:
     return request.app.state.planner
 
 def get_settings (request: Request) -> Settings:
     return request.app.state.settings
+
+def get_db(request: Request) -> Iterator[Session]:
+    session_factory = getattr(request.app.state, "session_factory", None)
+    if session_factory is None:
+        raise RuntimeError("SQL session factory is not configured")
+
+    db = session_factory()
+    try:
+        yield db
+    finally:
+        db.close()
 
 PlannerDep = Annotated[
     PlannerService,
