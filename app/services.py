@@ -1,10 +1,12 @@
 from app.exceptions import TaskNotFoundError
 from app.models import Task
 from app.storage import JsonTaskRepository
+from contextlib import nullcontext
 
 class PlannerService:
-    def __init__(self, storage=None, repository=None):
+    def __init__(self, storage=None, repository=None, write_scope=nullcontext):
         self.storage = storage
+        self.write_scope = write_scope
 
         if repository is None:
             repository = JsonTaskRepository(storage)
@@ -12,13 +14,14 @@ class PlannerService:
         self.jsonrepository = repository
 
     def add_task(self, title, priority, tags=None):
-        tags = list(tags or [])
-        
-        task = self.jsonrepository.create(
-            Task(id=0, title=title, priority=priority, tags = tags)
-            )
+        with self.write_scope():
+            tags = list(tags or [])
+            
+            task = self.jsonrepository.create(
+                Task(id=0, title=title, priority=priority, tags = tags)
+                )
 
-        return task
+            return task
     
 
     def get_task(self, task_id: int) -> Task:
@@ -90,19 +93,20 @@ class PlannerService:
         )
 
     def replace_task(self, task_id, title, priority, is_done):
-        old_task = self.jsonrepository.get(task_id)
-        if old_task is None:
-            raise TaskNotFoundError()
-        
-        updated_task = Task(
-            id=task_id,
-            title=title,
-            priority=priority,
-            is_done=is_done,
-            tags=old_task.tags
-        )
-        
-        return self.jsonrepository.replace(task_id, updated_task)
+        with self.write_scope():
+            old_task = self.jsonrepository.get(task_id)
+            if old_task is None:
+                raise TaskNotFoundError()
+            
+            updated_task = Task(
+                id=task_id,
+                title=title,
+                priority=priority,
+                is_done=is_done,
+                tags=old_task.tags
+            )
+            
+            return self.jsonrepository.replace(task_id, updated_task)
 
     def patch_task(self, task_id, title=None, priority=None, is_done=None):
         old_task = self.jsonrepository.get(task_id)
