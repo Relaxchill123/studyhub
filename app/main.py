@@ -4,29 +4,38 @@ from app.cli import show_menu, get_command, add, show, find, remove, done, stats
 from app.storage import JsonStorage, MemoryStorage
 from app.core.config import load_settings
 
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from app.DBase.repositories import SqlTaskRepository
 
 @contextmanager
 def sql_service_context(session_factory):
     session = session_factory()
     try:
-        yield build_service(repository=SqlTaskRepository(session))
+        yield build_service(
+            repository=SqlTaskRepository(session), 
+            write_scope=session.begin
+        )
     finally:
         session.close()
 
 
-def build_service(storage=None, settings=None, repository=None):
+def build_service(
+        storage=None, 
+        settings=None, 
+        repository=None, 
+        write_scope=nullcontext
+    ):
+
     if repository is not None:
-        return PlannerService(repository=repository)
+        return PlannerService(repository=repository, write_scope=write_scope)
 
     if storage is not None:
-        return PlannerService(storage)
+        return PlannerService(storage, write_scope=write_scope)
 
     if settings is None:
         settings = load_settings()
 
-    return PlannerService(JsonStorage(settings.json_path))
+    return PlannerService(JsonStorage(settings.json_path), write_scope=write_scope)
 
 def run():
 

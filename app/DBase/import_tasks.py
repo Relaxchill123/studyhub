@@ -105,7 +105,7 @@ def put_to_sqlite(source: list[TaskRow], target):
         finally:
             session.close()
 
-    return tasks
+    return session.scalars(select(TaskRow)).all()
 
 if __name__ == '__main__':
     settings = load_settings()
