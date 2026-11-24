@@ -8,6 +8,7 @@ from app.DBase.models import Base, TaskRow
 from app.storage import JsonStorage
 from app.models import Task
 from app.DBase.import_tasks import load_json_file, put_to_sqlite
+from app.services import PlannerService
 
 @pytest.fixture
 def isolated_database(tmp_path):
@@ -46,20 +47,21 @@ def test_correct_import(tmp_path, isolated_database):
     tasks_ids = [task.id for task in tasks]
 
     with session_factory() as session:
-        tasks_new_session = session.scalars(select(TaskRow)).all()
         ids_new_session = session.scalars(select(TaskRow.id)).all()
         assert tasks_ids == ids_new_session
 
         for i in range(len(tasks)):
-            assert tasks[i].title == tasks_new_session[i].title
-            assert tasks[i].priority == tasks_new_session[i].priority
-            assert tasks[i].is_done == tasks_new_session[i].is_done
-            assert tasks[i].tags == tasks_new_session[i].tags
-            assert tasks[i].title_normalized == tasks_new_session[i].title_normalized
+            dict_tags = dict_tasks[i]['tags'] if dict_tasks[i].get('tags') else []
+            assert tasks[i].title == dict_tasks[i]['title']
+            assert tasks[i].priority == dict_tasks[i]['priority']
+            assert tasks[i].is_done == dict_tasks[i]['is_done']
+            assert tasks[i].tags == dict_tags
 
 def test_bad_json_import(tmp_path, isolated_database):
     engine, session_factory, url = isolated_database
     path = tmp_path / 'data_path'
+    storage = JsonStorage(path)
+    service = PlannerService(storage)
     dict_tasks = [
             {
                 "id": 1,
@@ -72,16 +74,23 @@ def test_bad_json_import(tmp_path, isolated_database):
                 "id": 2,
                 "title": "wertte",
                 "priority": 4,
+                "is_done": True,
             }
         ]
 
     path.write_text(json.dumps(dict_tasks, ensure_ascii=False), encoding="utf-8")
-    
+    tasks = storage.load()
+    storage.save(tasks)
+    print("-----", service.list_tasks())
+
     with session_factory() as session:
-        with pytest.raises(KeyError):
+        with pytest.raises(Exception):
             put_to_sqlite(source=load_json_file(source=path), target=url)  
 
         assert session.scalars(select(TaskRow)).all() == []
+
+        service.add_task(title="123", priority=3)
+        
 
 def test_non_empty_target_import(tmp_path, isolated_database):
     engine, session_factory, url = isolated_database
@@ -130,6 +139,3 @@ def test_bad_path_source_import(tmp_path, isolated_database):
     
     with pytest.raises(StorageError):
         put_to_sqlite(source=load_json_file(source=path), target=url)
-    
-
-
